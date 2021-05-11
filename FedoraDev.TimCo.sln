@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FedoraDev.TimCo.DataManager
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "FedoraDev.TimCo.SQLData", "FedoraDev.TimCo.SQLData\FedoraDev.TimCo.SQLData.sqlproj", "{8EFE3E47-4D96-43F9-9D75-7D93B3429107}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FedoraDev.TimCo.UserInterface.WPF", "FedoraDev.TimCo.UserInterface.WPF\FedoraDev.TimCo.UserInterface.WPF.csproj", "{EC37C3BE-79D0-4280-A3B9-9D6A98C49E1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{8EFE3E47-4D96-43F9-9D75-7D93B3429107}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8EFE3E47-4D96-43F9-9D75-7D93B3429107}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8EFE3E47-4D96-43F9-9D75-7D93B3429107}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{EC37C3BE-79D0-4280-A3B9-9D6A98C49E1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC37C3BE-79D0-4280-A3B9-9D6A98C49E1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC37C3BE-79D0-4280-A3B9-9D6A98C49E1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC37C3BE-79D0-4280-A3B9-9D6A98C49E1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
