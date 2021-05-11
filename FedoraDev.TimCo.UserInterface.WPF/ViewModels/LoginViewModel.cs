@@ -11,6 +11,20 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private string _userName;
 		private string _password;
 		private readonly IAPIHelper _apiHelper;
+		private string _errorMessage;
+
+		public bool IsErrorVisible => ErrorMessage?.Length > 0;
+
+		public string ErrorMessage
+		{
+			get { return _errorMessage; }
+			set
+			{
+				_errorMessage = value;
+				NotifyOfPropertyChange(() => ErrorMessage);
+				NotifyOfPropertyChange(() => IsErrorVisible);
+			}
+		}
 
 		public string UserName
 		{
@@ -56,11 +70,12 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		{
 			try
 			{
+				ErrorMessage = string.Empty;
 				AuthenticatedUser aUser = await _apiHelper.Authenticate(UserName, Password);
 			}
 			catch (Exception exception)
 			{
-				Console.WriteLine(exception.Message);
+				ErrorMessage = exception.Message;
 			}
 		}
 	}
