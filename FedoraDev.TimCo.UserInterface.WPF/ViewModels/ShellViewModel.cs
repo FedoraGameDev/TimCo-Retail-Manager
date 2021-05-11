@@ -1,6 +1,15 @@
-﻿namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
+﻿using Caliburn.Micro;
+
+namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 {
-	public class ShellViewModel
+	public class ShellViewModel : Conductor<object>
 	{
+		private LoginViewModel _loginVM;
+
+		public ShellViewModel(LoginViewModel loginVM)
+		{
+			_loginVM = loginVM;
+			ActivateItem(_loginVM);
+		}
 	}
 }

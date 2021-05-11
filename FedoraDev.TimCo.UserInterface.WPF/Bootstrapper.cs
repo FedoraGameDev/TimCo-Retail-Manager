@@ -1,9 +1,11 @@
 ﻿using Caliburn.Micro;
+using FedoraDev.TimCo.UserInterface.WPF.Helpers;
 using FedoraDev.TimCo.UserInterface.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace FedoraDev.TimCo.UserInterface.WPF
 {
@@ -14,6 +16,12 @@ namespace FedoraDev.TimCo.UserInterface.WPF
 		public Bootstrapper()
 		{
 			Initialize();
+
+			_ = ConventionManager.AddElementConvention<PasswordBox>(
+				PasswordBoxHelper.BoundPasswordProperty,
+				"Password",
+				"PasswordChanged"
+			);
 		}
 
 		protected override void Configure()
@@ -22,6 +30,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF
 
 			_ = _container.Singleton<IWindowManager, WindowManager>();
 			_ = _container.Singleton<IEventAggregator, EventAggregator>();
+			_ = _container.Singleton<IAPIHelper, APIHelper>();
 
 			RegisterViewModels();
 		}
