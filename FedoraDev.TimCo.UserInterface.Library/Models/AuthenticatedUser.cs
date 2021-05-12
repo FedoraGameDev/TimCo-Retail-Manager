@@ -1,4 +1,4 @@
-﻿namespace FedoraDev.TimCo.UserInterface.WPF.Models
+﻿namespace FedoraDev.TimCo.UserInterface.Library.Models
 {
 	public class AuthenticatedUser
 	{

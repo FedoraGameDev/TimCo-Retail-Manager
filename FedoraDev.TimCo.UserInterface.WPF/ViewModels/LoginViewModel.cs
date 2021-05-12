@@ -1,10 +1,10 @@
 ﻿using Caliburn.Micro;
-using FedoraDev.TimCo.UserInterface.WPF.Helpers;
-using FedoraDev.TimCo.UserInterface.WPF.Models;
+using FedoraDev.TimCo.UserInterface.Library.Helpers;
+using FedoraDev.TimCo.UserInterface.Library.Models;
 using System;
 using System.Threading.Tasks;
 
-namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
+namespace FedoraDev.TimCo.UserInterface.Library.ViewModels
 {
 	public class LoginViewModel : Screen
 	{
@@ -14,6 +14,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private string _errorMessage;
 
 		public bool IsErrorVisible => ErrorMessage?.Length > 0;
+		public bool CanLogin => UserName?.Length > 0 && Password?.Length > 0;
 
 		public string ErrorMessage
 		{
@@ -48,19 +49,6 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			}
 		}
 
-		public bool CanLogin
-		{
-			get
-			{
-				bool canLogIn = false;
-
-				if (UserName?.Length > 0 && Password?.Length > 0)
-					canLogIn = true;
-
-				return canLogIn;
-			}
-		}
-
 		public LoginViewModel(IAPIHelper apiHelper)
 		{
 			_apiHelper = apiHelper;
@@ -72,6 +60,8 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			{
 				ErrorMessage = string.Empty;
 				AuthenticatedUser aUser = await _apiHelper.Authenticate(UserName, Password);
+
+				await _apiHelper.SetLoggedInUserInfo(aUser.Access_Token);
 			}
 			catch (Exception exception)
 			{

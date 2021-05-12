@@ -17,7 +17,8 @@ namespace FedoraDev.TimCo.DataManager.App_Start
 				@in = "header",
 				description = "access token",
 				required = false,
-				type = "string"
+				type = "string",
+				@default = "bearer "
 			});
 		}
 	}

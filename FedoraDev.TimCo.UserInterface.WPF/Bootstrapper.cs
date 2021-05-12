@@ -1,4 +1,6 @@
 ﻿using Caliburn.Micro;
+using FedoraDev.TimCo.UserInterface.Library.Helpers;
+using FedoraDev.TimCo.UserInterface.Library.Models;
 using FedoraDev.TimCo.UserInterface.WPF.Helpers;
 using FedoraDev.TimCo.UserInterface.WPF.ViewModels;
 using System;
@@ -31,6 +33,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF
 			_ = _container.Singleton<IWindowManager, WindowManager>();
 			_ = _container.Singleton<IEventAggregator, EventAggregator>();
 			_ = _container.Singleton<IAPIHelper, APIHelper>();
+			_ = _container.Singleton<ILoggedInUserModel, LoggedInUserModel>();
 
 			RegisterViewModels();
 		}
