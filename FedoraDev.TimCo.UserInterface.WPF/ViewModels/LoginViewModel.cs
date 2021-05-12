@@ -1,16 +1,18 @@
 ﻿using Caliburn.Micro;
 using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
+using FedoraDev.TimCo.UserInterface.WPF.EventModels;
 using System;
 using System.Threading.Tasks;
 
-namespace FedoraDev.TimCo.UserInterface.Library.ViewModels
+namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 {
 	public class LoginViewModel : Screen
 	{
 		private string _userName;
 		private string _password;
-		private readonly IAPIHelper _apiHelper;
+		private IAPIHelper _apiHelper;
+		private IEventAggregator _events;
 		private string _errorMessage;
 
 		public bool IsErrorVisible => ErrorMessage?.Length > 0;
@@ -49,9 +51,10 @@ namespace FedoraDev.TimCo.UserInterface.Library.ViewModels
 			}
 		}
 
-		public LoginViewModel(IAPIHelper apiHelper)
+		public LoginViewModel(IAPIHelper apiHelper, IEventAggregator events)
 		{
 			_apiHelper = apiHelper;
+			_events = events;
 		}
 
 		public async Task Login()
@@ -62,9 +65,13 @@ namespace FedoraDev.TimCo.UserInterface.Library.ViewModels
 				AuthenticatedUser aUser = await _apiHelper.Authenticate(UserName, Password);
 
 				await _apiHelper.SetLoggedInUserInfo(aUser.Access_Token);
+
+				_events.PublishOnUIThread(new LoginEvent());
 			}
 			catch (Exception exception)
 			{
+				Console.WriteLine(exception.Message);
+				Console.WriteLine(exception.StackTrace);
 				ErrorMessage = exception.Message;
 			}
 		}

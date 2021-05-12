@@ -32,6 +32,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			set {
 				_products = value;
 				NotifyOfPropertyChange(() => Products);
+				NotifyOfPropertyChange(() => CanAddToCart);
 			}
 		}
 

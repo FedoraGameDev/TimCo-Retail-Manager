@@ -23,7 +23,8 @@ namespace FedoraDev.TimCo.UserInterface.Library.Helpers
 		{
 			string api = ConfigurationManager.AppSettings["api"];
 
-			_apiClient = new HttpClient { BaseAddress = new Uri(api) };
+			_apiClient = new HttpClient();
+			_apiClient.BaseAddress = new Uri(api);
 			_apiClient.DefaultRequestHeaders.Accept.Clear();
 			_apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 		}
@@ -53,13 +54,14 @@ namespace FedoraDev.TimCo.UserInterface.Library.Helpers
 			_apiClient.DefaultRequestHeaders.Clear();
 			_apiClient.DefaultRequestHeaders.Accept.Clear();
 			_apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			_apiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+			_apiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer { token }");
 
 			using (HttpResponseMessage responseMessage = await _apiClient.GetAsync("/api/User"))
 			{
 				if (responseMessage.IsSuccessStatusCode)
 				{
-					LoggedInUserModel user = await responseMessage.Content.ReadAsAsync<LoggedInUserModel>();
+					List<LoggedInUserModel> users = await responseMessage.Content.ReadAsAsync<List<LoggedInUserModel>>();
+					LoggedInUserModel user = users[0];
 					_user.Token = token;
 					_user.Id = user.Id;
 					_user.FirstName = user.FirstName;
