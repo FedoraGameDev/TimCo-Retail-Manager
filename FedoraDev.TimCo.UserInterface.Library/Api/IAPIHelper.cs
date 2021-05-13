@@ -1,4 +1,5 @@
 ﻿using FedoraDev.TimCo.UserInterface.Library.Models;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace FedoraDev.TimCo.UserInterface.Library.Helpers
@@ -7,5 +8,6 @@ namespace FedoraDev.TimCo.UserInterface.Library.Helpers
 	{
 		Task<AuthenticatedUser> Authenticate(string username, string password);
 		Task SetLoggedInUserInfo(string token);
+		HttpClient ApiClient { get; }
 	}
 }

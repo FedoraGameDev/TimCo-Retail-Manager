@@ -13,6 +13,8 @@ namespace FedoraDev.TimCo.UserInterface.Library.Helpers
 		private HttpClient _apiClient;
 		private ILoggedInUserModel _user;
 
+		public HttpClient ApiClient => _apiClient;
+
 		public APIHelper(ILoggedInUserModel user)
 		{
 			InitilalizeClient();

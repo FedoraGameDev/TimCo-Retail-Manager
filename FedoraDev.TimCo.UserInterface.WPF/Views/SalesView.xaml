@@ -38,7 +38,13 @@
 			Grid.Column="1"
 			Grid.RowSpan="5"
 			MinHeight="200"
-			MinWidth="150" />
+			MinWidth="150">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding ProductName}" />
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
 
 		<!-- Add/Remove from Cart -->
 		<StackPanel Orientation="Vertical" Grid.Column="2" Grid.Row="2" Margin="20 0">

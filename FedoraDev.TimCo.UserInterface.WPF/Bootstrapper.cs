@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using FedoraDev.TimCo.UserInterface.Library.Api;
 using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
 using FedoraDev.TimCo.UserInterface.WPF.Helpers;
@@ -29,6 +30,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF
 		protected override void Configure()
 		{
 			_ = _container.Instance(_container);
+			_ = _container.PerRequest<IProductEndpoint, ProductEndpoint>();
 
 			_ = _container.Singleton<IWindowManager, WindowManager>();
 			_ = _container.Singleton<IEventAggregator, EventAggregator>();

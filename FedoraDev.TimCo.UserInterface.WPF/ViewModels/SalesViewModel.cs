@@ -1,12 +1,17 @@
 ﻿using Caliburn.Micro;
+using FedoraDev.TimCo.UserInterface.Library.Api;
+using FedoraDev.TimCo.UserInterface.Library.Models;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 {
 	public class SalesViewModel : Screen
 	{
-		private BindingList<string> _cart;
-		private BindingList<string> _products;
+		private IProductEndpoint _productEndpoint;
+		private BindingList<ProductModel> _cart;
+		private BindingList<ProductModel> _products;
 		private int _itemQuantity;
 
 		public string SubTotal => "$0.00";
@@ -16,7 +21,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		public bool CanRemoveFromCart => false;
 		public bool CanCheckout => false;
 
-		public BindingList<string> Cart
+		public BindingList<ProductModel> Cart
 		{
 			get { return _cart; }
 			set
@@ -26,7 +31,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			}
 		}
 
-		public BindingList<string> Products
+		public BindingList<ProductModel> Products
 		{
 			get { return _products; }
 			set {
@@ -45,6 +50,23 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 				NotifyOfPropertyChange(() => ItemQuantity);
 				NotifyOfPropertyChange(() => CanAddToCart);
 			}
+		}
+
+		public SalesViewModel(IProductEndpoint productEndpoint)
+		{
+			_productEndpoint = productEndpoint;
+		}
+
+		protected override async void OnViewLoaded(object view)
+		{
+			base.OnViewLoaded(view);
+			await LoadProducts();
+		}
+
+		private async Task LoadProducts()
+		{
+			List<ProductModel> productList = await _productEndpoint.GetAll();
+			Products = new BindingList<ProductModel>(productList);
 		}
 
 		public void AddToCart()
