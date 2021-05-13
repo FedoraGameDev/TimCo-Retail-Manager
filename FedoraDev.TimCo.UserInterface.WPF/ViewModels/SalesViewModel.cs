@@ -1,6 +1,8 @@
 ﻿using Caliburn.Micro;
 using FedoraDev.TimCo.UserInterface.Library.Api;
+using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -12,6 +14,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 	{
 		#region Fields
 		private IProductEndpoint _productEndpoint;
+		private readonly IConfigHelper _configHelper;
 		private BindingList<CartItemModel> _cart;
 		private BindingList<ProductModel> _products;
 		private int _itemQuantity = 1;
@@ -19,9 +22,9 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		#endregion
 
 		#region Properties
-		public string SubTotal => GetSubTotal().ToString("C");
-		public string Tax => GetTax().ToString("C");
-		public string Total => GetTotal().ToString("C");
+		public string SubTotal => CalculateSubTotal().ToString("C");
+		public string Tax => CalculateTax().ToString("C");
+		public string Total => CalculateTotal().ToString("C");
 		public bool CanAddToCart => ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity;
 		public bool CanRemoveFromCart => false;
 		public bool CanCheckout => false;
@@ -66,9 +69,11 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		}
 		#endregion
 
-		public SalesViewModel(IProductEndpoint productEndpoint)
+		#region Initialization
+		public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
 		{
 			_productEndpoint = productEndpoint;
+			_configHelper = configHelper;
 			Cart = new BindingList<CartItemModel>();
 		}
 
@@ -83,7 +88,9 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			List<ProductModel> productList = await _productEndpoint.GetAll();
 			Products = new BindingList<ProductModel>(productList);
 		}
+		#endregion
 
+		#region WPF Buttons
 		public void AddToCart()
 		{
 			CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
@@ -123,8 +130,10 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		{
 			//
 		}
+		#endregion
 
-		public decimal GetSubTotal()
+		#region Property Helpers
+		private decimal CalculateSubTotal()
 		{
 			decimal subTotal = 0;
 			foreach (CartItemModel item in Cart)
@@ -132,14 +141,21 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			return subTotal;
 		}
 
-		public decimal GetTax()
+		private decimal CalculateTax()
 		{
-			return 0;
+			decimal taxAmount = 0;
+			foreach (CartItemModel item in Cart)
+			{
+				decimal taxRate = (item.Product.Taxable ? _configHelper.GetTaxRate() : 0m);
+				taxAmount += item.QuantityInCart * item.Product.RetailPrice * taxRate;
+			}
+			return Math.Round(taxAmount + 0.005m, 2);
 		}
 
-		public decimal GetTotal()
+		private decimal CalculateTotal()
 		{
-			return GetSubTotal() + GetTax();
+			return CalculateSubTotal() + CalculateTax();
 		}
+		#endregion
 	}
 }

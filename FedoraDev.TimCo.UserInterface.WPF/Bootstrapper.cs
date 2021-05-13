@@ -36,6 +36,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF
 			_ = _container.Singleton<IEventAggregator, EventAggregator>();
 			_ = _container.Singleton<IAPIHelper, APIHelper>();
 			_ = _container.Singleton<ILoggedInUserModel, LoggedInUserModel>();
+			_ = _container.Singleton<IConfigHelper, ConfigHelper>();
 
 			RegisterViewModels();
 		}
