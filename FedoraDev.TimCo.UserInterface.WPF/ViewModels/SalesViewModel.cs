@@ -144,11 +144,12 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private decimal CalculateTax()
 		{
 			decimal taxAmount = 0;
-			foreach (CartItemModel item in Cart)
-			{
-				decimal taxRate = (item.Product.Taxable ? _configHelper.GetTaxRate() : 0m);
-				taxAmount += item.QuantityInCart * item.Product.RetailPrice * taxRate;
-			}
+			decimal taxRate = _configHelper.GetTaxRate();
+
+			taxAmount = Cart
+				.Where(item => item.Product.Taxable)
+				.Sum(item => item.Product.RetailPrice * item.QuantityInCart * taxRate);
+
 			return Math.Round(taxAmount + 0.005m, 2);
 		}
 
