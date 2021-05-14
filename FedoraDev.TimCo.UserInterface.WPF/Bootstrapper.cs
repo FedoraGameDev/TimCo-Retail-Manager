@@ -1,8 +1,10 @@
-﻿using Caliburn.Micro;
+﻿using AutoMapper;
+using Caliburn.Micro;
 using FedoraDev.TimCo.UserInterface.Library.Api;
 using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
 using FedoraDev.TimCo.UserInterface.WPF.Helpers;
+using FedoraDev.TimCo.UserInterface.WPF.Models;
 using FedoraDev.TimCo.UserInterface.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -29,37 +31,37 @@ namespace FedoraDev.TimCo.UserInterface.WPF
 
 		protected override void Configure()
 		{
-			_ = _container.Instance(_container);
-			_ = _container.PerRequest<IProductEndpoint, ProductEndpoint>();
-			_ = _container.PerRequest<ISaleEndpoint, SaleEndpoint>();
+			_ = _container
+				.Instance(_container)
+				.Instance(ConfigureAutomapper());
 
-			_ = _container.Singleton<IWindowManager, WindowManager>();
-			_ = _container.Singleton<IEventAggregator, EventAggregator>();
-			_ = _container.Singleton<IAPIHelper, APIHelper>();
-			_ = _container.Singleton<ILoggedInUserModel, LoggedInUserModel>();
-			_ = _container.Singleton<IConfigHelper, ConfigHelper>();
+			_ = _container
+				.PerRequest<IProductEndpoint, ProductEndpoint>()
+				.PerRequest<ISaleEndpoint, SaleEndpoint>();
+
+			_ = _container
+				.Singleton<IWindowManager, WindowManager>()
+				.Singleton<IEventAggregator, EventAggregator>()
+				.Singleton<IAPIHelper, APIHelper>()
+				.Singleton<ILoggedInUserModel, LoggedInUserModel>()
+				.Singleton<IConfigHelper, ConfigHelper>();
 
 			RegisterViewModels();
 		}
 
-		protected override void OnStartup(object sender, StartupEventArgs e)
-		{
-			DisplayRootViewFor<ShellViewModel>();
-		}
+		protected override void OnStartup(object sender, StartupEventArgs e) { DisplayRootViewFor<ShellViewModel>(); }
+		protected override object GetInstance(Type service, string key) { return _container.GetInstance(service, key); }
+		protected override IEnumerable<object> GetAllInstances(Type service) { return _container.GetAllInstances(service); }
+		protected override void BuildUp(object instance) { _container.BuildUp(instance); }
 
-		protected override object GetInstance(Type service, string key)
+		IMapper ConfigureAutomapper()
 		{
-			return _container.GetInstance(service, key);
-		}
+			MapperConfiguration config = new MapperConfiguration(cfg => {
+				_ = cfg.CreateMap<ProductModel, ProductWPFModel>();
+				_ = cfg.CreateMap<CartItemModel, CartItemWPFModel>();
+			});
 
-		protected override IEnumerable<object> GetAllInstances(Type service)
-		{
-			return _container.GetAllInstances(service);
-		}
-
-		protected override void BuildUp(object instance)
-		{
-			_container.BuildUp(instance);
+			return config.CreateMapper();
 		}
 
 		void RegisterViewModels()

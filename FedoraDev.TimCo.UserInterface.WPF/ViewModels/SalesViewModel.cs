@@ -1,7 +1,9 @@
-﻿using Caliburn.Micro;
+﻿using AutoMapper;
+using Caliburn.Micro;
 using FedoraDev.TimCo.UserInterface.Library.Api;
 using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
+using FedoraDev.TimCo.UserInterface.WPF.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,13 +15,14 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 	public class SalesViewModel : Screen
 	{
 		#region Fields
-		private IProductEndpoint _productEndpoint;
+		private readonly IProductEndpoint _productEndpoint;
 		private readonly ISaleEndpoint _saleEndpoint;
+		private readonly IMapper _mapper;
 		private readonly IConfigHelper _configHelper;
-		private BindingList<CartItemModel> _cart;
-		private BindingList<ProductModel> _products;
+		private BindingList<CartItemWPFModel> _cart;
+		private BindingList<ProductWPFModel> _products;
 		private int _itemQuantity = 1;
-		private ProductModel _selectedProduct;
+		private ProductWPFModel _selectedProduct;
 		#endregion
 
 		#region Properties
@@ -30,7 +33,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		public bool CanRemoveFromCart => false;
 		public bool CanCheckout => Cart.Count > 0;
 
-		public BindingList<CartItemModel> Cart
+		public BindingList<CartItemWPFModel> Cart
 		{
 			get { return _cart; }
 			set {
@@ -39,7 +42,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			}
 		}
 
-		public BindingList<ProductModel> Products
+		public BindingList<ProductWPFModel> Products
 		{
 			get { return _products; }
 			set {
@@ -59,7 +62,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			}
 		}
 
-		public ProductModel SelectedProduct
+		public ProductWPFModel SelectedProduct
 		{
 			get { return _selectedProduct; }
 			set {
@@ -71,12 +74,13 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		#endregion
 
 		#region Initialization
-		public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IConfigHelper configHelper)
+		public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IMapper mapper, IConfigHelper configHelper)
 		{
 			_productEndpoint = productEndpoint;
 			_saleEndpoint = saleEndpoint;
+			_mapper = mapper;
 			_configHelper = configHelper;
-			Cart = new BindingList<CartItemModel>();
+			Cart = new BindingList<CartItemWPFModel>();
 		}
 
 		protected override async void OnViewLoaded(object view)
@@ -88,25 +92,22 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private async Task LoadProducts()
 		{
 			List<ProductModel> productList = await _productEndpoint.GetAll();
-			Products = new BindingList<ProductModel>(productList);
+			List<ProductWPFModel> products = _mapper.Map<List<ProductWPFModel>>(productList);
+			Products = new BindingList<ProductWPFModel>(products);
 		}
 		#endregion
 
 		#region WPF Buttons
 		public void AddToCart()
 		{
-			CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
+			CartItemWPFModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
 			if (existingItem != null)
 			{
 				existingItem.QuantityInCart += ItemQuantity;
-
-				// HACK - Need to notify of sub-property change within Cart (QuantityInCart)
-				_ = Cart.Remove(existingItem);
-				Cart.Add(existingItem);
 			}
 			else
 			{
-				CartItemModel cartItem = new CartItemModel()
+				CartItemWPFModel cartItem = new CartItemWPFModel()
 				{
 					Product = SelectedProduct,
 					QuantityInCart = ItemQuantity
@@ -134,7 +135,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		{
 			SaleModel sale = new SaleModel();
 
-			foreach (CartItemModel cartItem in Cart)
+			foreach (CartItemWPFModel cartItem in Cart)
 			{
 				sale.SaleDetails.Add(new SaleDetailModel()
 				{
@@ -151,7 +152,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private decimal CalculateSubTotal()
 		{
 			decimal subTotal = 0;
-			foreach (CartItemModel item in Cart)
+			foreach (CartItemWPFModel item in Cart)
 				subTotal += item.Product.RetailPrice * item.QuantityInCart;
 			return subTotal;
 		}
