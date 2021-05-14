@@ -1,4 +1,5 @@
-﻿using FedoraDev.TimCo.DataManager.Library.DataAccess;
+﻿using FedoraDev.TimCo.DataManager.Library.Const;
+using FedoraDev.TimCo.DataManager.Library.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
 using Microsoft.AspNet.Identity;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace FedoraDev.TimCo.DataManager.Controllers
 	public class SaleController : ApiController
     {
         [HttpPost]
+        [Authorize(Roles = Roles.CASHIER)]
         public void Post(SaleModel sale)
         {
             SaleData saleData = new SaleData();
@@ -19,6 +21,7 @@ namespace FedoraDev.TimCo.DataManager.Controllers
 		}
 
         [HttpGet, Route("GetSalesReport")]
+        [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
         public List<SaleReportModel> GetSalesReport()
 		{
             SaleData saleData = new SaleData();

@@ -23,7 +23,7 @@ namespace FedoraDev.TimCo.DataManager.Controllers
     [RoutePrefix("api/Account")]
     public class AccountController : ApiController
     {
-        private const string LocalLoginProvider = "Local";
+        private const string LOCAL_LOGIN_PROVIDER = "Local";
         private ApplicationUserManager _userManager;
 
         public AccountController()
@@ -100,14 +100,14 @@ namespace FedoraDev.TimCo.DataManager.Controllers
             {
                 logins.Add(new UserLoginInfoViewModel
                 {
-                    LoginProvider = LocalLoginProvider,
+                    LoginProvider = LOCAL_LOGIN_PROVIDER,
                     ProviderKey = user.UserName,
                 });
             }
 
             return new ManageInfoViewModel
             {
-                LocalLoginProvider = LocalLoginProvider,
+                LocalLoginProvider = LOCAL_LOGIN_PROVIDER,
                 Email = user.UserName,
                 Logins = logins,
                 ExternalLoginProviders = GetExternalLogins(returnUrl, generateState)
@@ -202,7 +202,7 @@ namespace FedoraDev.TimCo.DataManager.Controllers
 
             IdentityResult result;
 
-            if (model.LoginProvider == LocalLoginProvider)
+            if (model.LoginProvider == LOCAL_LOGIN_PROVIDER)
             {
                 result = await UserManager.RemovePasswordAsync(User.Identity.GetUserId());
             }
