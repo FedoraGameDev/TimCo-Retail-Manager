@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FedoraDev.TimCo.UserInterface.WPF.Views"
         mc:Ignorable="d" FontSize="18"
-        Title="ShellView" Height="600" Width="1000">
+        Title="TimCo Retail Manager" Height="600" Width="1000">
     <DockPanel>
 		<Menu DockPanel.Dock="Top" FontSize="18">
 			<MenuItem Header="_File">
