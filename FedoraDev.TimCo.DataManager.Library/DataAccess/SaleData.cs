@@ -10,6 +10,24 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 	{
 		public void SaveSale(SaleModel saleInfo, string cashierId)
 		{
+			List<SaleDetailDBModel> saleDetails = GenerateSaleDetails(saleInfo);
+			SaleDBModel sale = GenerateSale(cashierId, saleDetails);
+
+			SaveToDatabase(saleDetails, sale);
+		}
+
+		private static SaleDBModel GenerateSale(string cashierId, List<SaleDetailDBModel> saleDetails)
+		{
+			return new SaleDBModel()
+			{
+				CashierId = cashierId,
+				SubTotal = saleDetails.Sum(saleDetail => saleDetail.PurchasePrice),
+				Tax = saleDetails.Sum(saleDetail => saleDetail.Tax)
+			};
+		}
+
+		private static List<SaleDetailDBModel> GenerateSaleDetails(SaleModel saleInfo)
+		{
 			ProductData product = new ProductData();
 
 			List<SaleDetailDBModel> saleDetails = new List<SaleDetailDBModel>();
@@ -32,24 +50,34 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 				});
 			}
 
-			SaleDBModel sale = new SaleDBModel()
+			return saleDetails;
+		}
+
+		private static void SaveToDatabase(List<SaleDetailDBModel> saleDetails, SaleDBModel sale)
+		{
+			using (SqlDataAccess sql = new SqlDataAccess())
 			{
-				CashierId = cashierId,
-				SubTotal = saleDetails.Sum(saleDetail => saleDetail.PurchasePrice),
-				Tax = saleDetails.Sum(saleDetail => saleDetail.Tax)
-			};
+				try
+				{
+					sql.StartTransaction("TimCo-Data");
+					sql.SaveDataInTransaction("dbo.spSaleInsert", sale);
 
-			SqlDataAccess sql = new SqlDataAccess();
-			sql.SaveData("dbo.spSaleInsert", sale, "TimCo-Data");
+					var parameters = new { sale.CashierId, sale.SaleDate };
+					sale.Id = sql.LoadDataInTransaction<int, dynamic>("dbo.spSaleLookup", parameters).FirstOrDefault();
 
-			var parameters = new { sale.CashierId, sale.SaleDate };
+					foreach (SaleDetailDBModel saleDetail in saleDetails)
+					{
+						saleDetail.SaleId = sale.Id;
+						sql.SaveDataInTransaction("dbo.spSaleDetailInsert", saleDetail);
+					}
 
-			sale.Id = sql.LoadData<int, dynamic>("dbo.spSaleLookup", parameters, "TimCo-Data").FirstOrDefault();
-
-			foreach (SaleDetailDBModel saleDetail in saleDetails)
-			{
-				saleDetail.SaleId = sale.Id;
-				sql.SaveData("dbo.spSaleDetailInsert", saleDetail, "TimCo-Data");
+					sql.CommitTransaction();
+				}
+				catch
+				{
+					sql.RollbackTransaction();
+					throw;
+				}
 			}
 		}
 	}
