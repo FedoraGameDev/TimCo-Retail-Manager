@@ -9,6 +9,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 {
 	public class LoginViewModel : Screen
 	{
+		#region Fields
 #if DEBUG
 		private string _userName = "dude@place.com";
 		private string _password = "Pwd12345.";
@@ -19,7 +20,9 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private IAPIHelper _apiHelper;
 		private IEventAggregator _events;
 		private string _errorMessage;
+		#endregion
 
+		#region Properties
 		public bool IsErrorVisible => ErrorMessage?.Length > 0;
 		public bool CanLogin => UserName?.Length > 0 && Password?.Length > 0;
 
@@ -55,6 +58,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 				NotifyOfPropertyChange(() => CanLogin);
 			}
 		}
+		#endregion
 
 		public LoginViewModel(IAPIHelper apiHelper, IEventAggregator events)
 		{

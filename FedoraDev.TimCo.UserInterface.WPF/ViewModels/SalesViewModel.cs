@@ -85,7 +85,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		}
 		#endregion
 
-		#region Initialization
+		#region Life Cycle
 		public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IMapper mapper, IConfigHelper configHelper)
 		{
 			_productEndpoint = productEndpoint;
@@ -106,6 +106,17 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			List<ProductModel> productList = await _productEndpoint.GetAll();
 			List<ProductWPFModel> products = _mapper.Map<List<ProductWPFModel>>(productList);
 			Products = new BindingList<ProductWPFModel>(products);
+		}
+
+		private async Task ResetSalesViewModel()
+		{
+			Cart.Clear();
+			await LoadProducts();
+
+			NotifyOfPropertyChange(() => CanCheckout);
+			NotifyOfPropertyChange(() => SubTotal);
+			NotifyOfPropertyChange(() => Tax);
+			NotifyOfPropertyChange(() => Total);
 		}
 		#endregion
 
@@ -165,6 +176,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			}
 
 			await _saleEndpoint.PostSale(sale);
+			ResetSalesViewModel();
 		}
 		#endregion
 

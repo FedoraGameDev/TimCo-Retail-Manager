@@ -10,5 +10,7 @@ namespace FedoraDev.TimCo.UserInterface.Library.Models
 		string Id { get; set; }
 		string LastName { get; set; }
 		string Token { get; set; }
+
+		void Clear();
 	}
 }
