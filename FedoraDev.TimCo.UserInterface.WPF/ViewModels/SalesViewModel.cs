@@ -7,8 +7,10 @@ using FedoraDev.TimCo.UserInterface.WPF.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 {
@@ -19,6 +21,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private readonly ISaleEndpoint _saleEndpoint;
 		private readonly IMapper _mapper;
 		private readonly IConfigHelper _configHelper;
+		private readonly IWindowManager _window;
 		private BindingList<CartItemWPFModel> _cart;
 		private BindingList<ProductWPFModel> _products;
 		private int _itemQuantity = 1;
@@ -86,19 +89,46 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		#endregion
 
 		#region Life Cycle
-		public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IMapper mapper, IConfigHelper configHelper)
+		public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IMapper mapper, IConfigHelper configHelper, IWindowManager window)
 		{
 			_productEndpoint = productEndpoint;
 			_saleEndpoint = saleEndpoint;
 			_mapper = mapper;
 			_configHelper = configHelper;
+			_window = window;
 			Cart = new BindingList<CartItemWPFModel>();
 		}
 
 		protected override async void OnViewLoaded(object view)
 		{
-			base.OnViewLoaded(view);
-			await LoadProducts();
+			try
+			{
+				base.OnViewLoaded(view);
+				await LoadProducts();
+			}
+			catch (Exception ex)
+			{
+				StatusInfoViewModel infoViewModel = IoC.Get<StatusInfoViewModel>();
+				dynamic settings = new ExpandoObject();
+				settings.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+				settings.ResizeMode = ResizeMode.NoResize;
+
+				if (ex.Message == "Unauthorizedd")
+				{
+					settings.Title = "Authorization Error";
+
+					infoViewModel.UpdateMessage("Unauthorized Access", "You are not authorized to interact with the sales form.");
+					_window.ShowDialog(infoViewModel, null, settings);
+					TryClose(); 
+				}
+				else
+				{
+					settings.Title = "Fatal Exception";
+
+					infoViewModel.UpdateMessage("Fatal Exception", ex.Message);
+					_window.ShowDialog(infoViewModel, null, settings);
+				}
+			}
 		}
 
 		private async Task LoadProducts()
