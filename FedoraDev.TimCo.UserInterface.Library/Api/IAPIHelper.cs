@@ -8,6 +8,7 @@ namespace FedoraDev.TimCo.UserInterface.Library.Helpers
 	{
 		Task<AuthenticatedUser> Authenticate(string username, string password);
 		Task SetLoggedInUserInfo(string token);
+		void LogoutUser();
 		HttpClient ApiClient { get; }
 	}
 }

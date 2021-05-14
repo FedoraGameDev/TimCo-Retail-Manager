@@ -51,6 +51,11 @@ namespace FedoraDev.TimCo.UserInterface.Library.Helpers
 			}
 		}
 
+		public void LogoutUser()
+		{
+			_apiClient.DefaultRequestHeaders.Clear();
+		}
+
 		public async Task SetLoggedInUserInfo(string token)
 		{
 			_apiClient.DefaultRequestHeaders.Clear();
