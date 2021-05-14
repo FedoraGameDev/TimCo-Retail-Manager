@@ -23,6 +23,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private BindingList<ProductWPFModel> _products;
 		private int _itemQuantity = 1;
 		private ProductWPFModel _selectedProduct;
+		private CartItemWPFModel _selectedCartItem;
 		#endregion
 
 		#region Properties
@@ -30,7 +31,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		public string Tax => CalculateTax().ToString("C");
 		public string Total => CalculateTotal().ToString("C");
 		public bool CanAddToCart => ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity;
-		public bool CanRemoveFromCart => false;
+		public bool CanRemoveFromCart => ItemQuantity > 0 && SelectedCartItem?.QuantityInCart >= ItemQuantity;
 		public bool CanCheckout => Cart.Count > 0;
 
 		public BindingList<CartItemWPFModel> Cart
@@ -59,6 +60,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 				_itemQuantity = value;
 				NotifyOfPropertyChange(() => ItemQuantity);
 				NotifyOfPropertyChange(() => CanAddToCart);
+				NotifyOfPropertyChange(() => CanRemoveFromCart);
 			}
 		}
 
@@ -69,6 +71,16 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 				_selectedProduct = value;
 				NotifyOfPropertyChange(() => SelectedProduct);
 				NotifyOfPropertyChange(() => CanAddToCart);
+			}
+		}
+
+		public CartItemWPFModel SelectedCartItem
+		{
+			get { return _selectedCartItem; }
+			set {
+				_selectedCartItem = value;
+				NotifyOfPropertyChange(() => SelectedCartItem);
+				NotifyOfPropertyChange(() => CanRemoveFromCart);
 			}
 		}
 		#endregion
@@ -125,6 +137,14 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 
 		public void RemoveFromCart()
 		{
+			SelectedCartItem.Product.QuantityInStock += ItemQuantity;
+
+			if (SelectedCartItem.QuantityInCart > ItemQuantity)
+				SelectedCartItem.QuantityInCart -= ItemQuantity;
+			else
+				_ = Cart.Remove(SelectedCartItem);
+
+			ItemQuantity = 1;
 			NotifyOfPropertyChange(() => CanCheckout);
 			NotifyOfPropertyChange(() => SubTotal);
 			NotifyOfPropertyChange(() => Tax);
