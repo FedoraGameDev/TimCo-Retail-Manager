@@ -12,6 +12,7 @@ namespace FedoraDev.TimCo.DataManager.Library.Internal.DataAccess
 	{
 		private IDbConnection _connection;
 		private IDbTransaction _transaction;
+		private bool _isClosed = true;
 
 		public string GetConnectionString(string name)
 		{
@@ -46,28 +47,50 @@ namespace FedoraDev.TimCo.DataManager.Library.Internal.DataAccess
 
 		public void StartTransaction(string connectionStringName)
 		{
+			if (!_isClosed) return;
+
 			string connectionString = GetConnectionString(connectionStringName);
 
 			_connection = new SqlConnection(connectionString);
 			_connection.Open();
 			_transaction = _connection.BeginTransaction();
+
+			_isClosed = false;
 		}
 
 		public void CommitTransaction()
 		{
+			if (_isClosed) return;
+			_isClosed = true;
+
 			_transaction?.Commit();
-			_connection?.Close();
+			_connection.Close();
 		}
 
 		public void RollbackTransaction()
 		{
+			if (_isClosed) return;
+			_isClosed = true;
+
 			_transaction?.Rollback();
-			_connection?.Close();
+			_connection.Close();
 		}
 
 		public void Dispose()
 		{
-			CommitTransaction();
+			try
+			{
+				CommitTransaction();
+			}
+			catch (Exception exception)
+			{
+				Console.WriteLine(exception.StackTrace);
+				Console.WriteLine(exception.Message);
+				throw;
+			}
+
+			_transaction = null;
+			_connection = null;
 		}
 	}
 }
