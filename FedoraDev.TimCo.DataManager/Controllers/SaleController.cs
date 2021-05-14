@@ -1,14 +1,12 @@
 ﻿using FedoraDev.TimCo.DataManager.Library.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
-using FedoraDev.TimCo.DataManager.Models;
 using Microsoft.AspNet.Identity;
-using System;
 using System.Collections.Generic;
 using System.Web.Http;
 
 namespace FedoraDev.TimCo.DataManager.Controllers
 {
-    [Authorize]
+	[Authorize]
 	public class SaleController : ApiController
     {
         [HttpPost]
