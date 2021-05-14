@@ -16,6 +16,14 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 			SaveToDatabase(saleDetails, sale);
 		}
 
+		public List<SaleReportModel> GetSaleReport()
+		{
+			SqlDataAccess sql = new SqlDataAccess();
+
+			var parameters = new { };
+			return sql.LoadData<SaleReportModel, dynamic>("dbo.spSaleReport", parameters, "TimCo-Data");
+		}
+
 		private static SaleDBModel GenerateSale(string cashierId, List<SaleDetailDBModel> saleDetails)
 		{
 			return new SaleDBModel()

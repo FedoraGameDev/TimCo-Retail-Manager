@@ -77,6 +77,9 @@
     <Build Include="dbo\Stored Procedures\spSaleInsert.sql" />
     <Build Include="dbo\Stored Procedures\spSaleDetailInsert.sql" />
     <Build Include="dbo\Stored Procedures\spSaleLookup.sql" />
+    <Build Include="dbo\Stored Procedures\spInventoryGetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spInventoryInsert.sql" />
+    <Build Include="dbo\Stored Procedures\spSaleReport.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="FedoraDev.TimCo.SQLData.refactorlog" />
