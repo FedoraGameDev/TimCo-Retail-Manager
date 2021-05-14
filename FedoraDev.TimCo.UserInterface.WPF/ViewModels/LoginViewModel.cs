@@ -9,8 +9,13 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 {
 	public class LoginViewModel : Screen
 	{
+#if DEBUG
+		private string _userName = "dude@place.com";
+		private string _password = "Pwd12345.";
+#else
 		private string _userName;
 		private string _password;
+#endif
 		private IAPIHelper _apiHelper;
 		private IEventAggregator _events;
 		private string _errorMessage;

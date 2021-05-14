@@ -31,6 +31,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF
 		{
 			_ = _container.Instance(_container);
 			_ = _container.PerRequest<IProductEndpoint, ProductEndpoint>();
+			_ = _container.PerRequest<ISaleEndpoint, SaleEndpoint>();
 
 			_ = _container.Singleton<IWindowManager, WindowManager>();
 			_ = _container.Singleton<IEventAggregator, EventAggregator>();

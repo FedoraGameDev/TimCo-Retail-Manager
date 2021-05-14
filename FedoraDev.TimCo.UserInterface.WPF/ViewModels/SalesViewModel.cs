@@ -14,6 +14,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 	{
 		#region Fields
 		private IProductEndpoint _productEndpoint;
+		private readonly ISaleEndpoint _saleEndpoint;
 		private readonly IConfigHelper _configHelper;
 		private BindingList<CartItemModel> _cart;
 		private BindingList<ProductModel> _products;
@@ -27,7 +28,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		public string Total => CalculateTotal().ToString("C");
 		public bool CanAddToCart => ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity;
 		public bool CanRemoveFromCart => false;
-		public bool CanCheckout => false;
+		public bool CanCheckout => Cart.Count > 0;
 
 		public BindingList<CartItemModel> Cart
 		{
@@ -70,9 +71,10 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		#endregion
 
 		#region Initialization
-		public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
+		public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IConfigHelper configHelper)
 		{
 			_productEndpoint = productEndpoint;
+			_saleEndpoint = saleEndpoint;
 			_configHelper = configHelper;
 			Cart = new BindingList<CartItemModel>();
 		}
@@ -114,6 +116,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 
 			SelectedProduct.QuantityInStock -= ItemQuantity;
 			ItemQuantity = 1;
+			NotifyOfPropertyChange(() => CanCheckout);
 			NotifyOfPropertyChange(() => SubTotal);
 			NotifyOfPropertyChange(() => Tax);
 			NotifyOfPropertyChange(() => Total);
@@ -121,14 +124,26 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 
 		public void RemoveFromCart()
 		{
+			NotifyOfPropertyChange(() => CanCheckout);
 			NotifyOfPropertyChange(() => SubTotal);
 			NotifyOfPropertyChange(() => Tax);
 			NotifyOfPropertyChange(() => Total);
 		}
 
-		public void Checkout()
+		public async Task Checkout()
 		{
-			//
+			SaleModel sale = new SaleModel();
+
+			foreach (CartItemModel cartItem in Cart)
+			{
+				sale.SaleDetails.Add(new SaleDetailModel()
+				{
+					ProductId = cartItem.Product.Id,
+					Quantity = cartItem.QuantityInCart
+				});
+			}
+
+			await _saleEndpoint.PostSale(sale);
 		}
 		#endregion
 
