@@ -1,5 +1,6 @@
 ﻿using FedoraDev.TimCo.DataManager.Library.Internal.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,13 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 {
 	public class SaleData
 	{
+		private readonly IConfiguration _configuration;
+
+		public SaleData(IConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
+
 		public void SaveSale(SaleModel saleInfo, string cashierId)
 		{
 			List<SaleDetailDBModel> saleDetails = GenerateSaleDetails(saleInfo);
@@ -18,13 +26,13 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 
 		public List<SaleReportModel> GetSaleReport()
 		{
-			SqlDataAccess sql = new SqlDataAccess();
+			SqlDataAccess sql = new SqlDataAccess(_configuration);
 
 			var parameters = new { };
 			return sql.LoadData<SaleReportModel, dynamic>("dbo.spSaleReport", parameters, "TimCo-Data");
 		}
 
-		private static SaleDBModel GenerateSale(string cashierId, List<SaleDetailDBModel> saleDetails)
+		private SaleDBModel GenerateSale(string cashierId, List<SaleDetailDBModel> saleDetails)
 		{
 			return new SaleDBModel()
 			{
@@ -34,9 +42,9 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 			};
 		}
 
-		private static List<SaleDetailDBModel> GenerateSaleDetails(SaleModel saleInfo)
+		private List<SaleDetailDBModel> GenerateSaleDetails(SaleModel saleInfo)
 		{
-			ProductData product = new ProductData();
+			ProductData product = new ProductData(_configuration);
 
 			List<SaleDetailDBModel> saleDetails = new List<SaleDetailDBModel>();
 			foreach (SaleDetailModel saleDetail in saleInfo.SaleDetails)
@@ -61,9 +69,9 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 			return saleDetails;
 		}
 
-		private static void SaveToDatabase(List<SaleDetailDBModel> saleDetails, SaleDBModel sale)
+		private void SaveToDatabase(List<SaleDetailDBModel> saleDetails, SaleDBModel sale)
 		{
-			using (SqlDataAccess sql = new SqlDataAccess())
+			using (SqlDataAccess sql = new SqlDataAccess(_configuration))
 			{
 				try
 				{
