@@ -1,28 +1,39 @@
 ﻿using FedoraDev.TimCo.DataManager.Library.Const;
 using FedoraDev.TimCo.DataManager.Library.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
-using System.Web.Http;
 
-namespace FedoraDev.TimCo.DataManager.Controllers
+namespace FedoraDev.TimCo.Data.API.Controllers
 {
-    [Authorize]
-	public class InventoryController : ApiController
-    {
-        [HttpGet]
-        [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
-        public List<InventoryModel> Get()
+	[Authorize]
+	[Route("api/[controller]")]
+	[ApiController]
+	public class InventoryController : ControllerBase
+	{
+		private readonly IConfiguration _configuration;
+
+		public InventoryController(IConfiguration configuration)
 		{
-            InventoryData inventory = new InventoryData();
-            return inventory.GetInventory();
+			_configuration = configuration;
 		}
 
-        [HttpPost]
-        [Authorize(Roles = Roles.ADMIN)]
-        public void Post(InventoryModel itemData)
+		[HttpGet]
+		[Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
+		public List<InventoryModel> Get()
 		{
-            InventoryData inventory = new InventoryData();
-            inventory.SaveInventoryItem(itemData);
+			InventoryData inventory = new InventoryData(_configuration);
+			return inventory.GetInventory();
 		}
-    }
+
+		[HttpPost]
+		[Authorize(Roles = Roles.ADMIN)]
+		public void Post(InventoryModel itemData)
+		{
+			InventoryData inventory = new InventoryData(_configuration);
+			inventory.SaveInventoryItem(itemData);
+		}
+	}
 }

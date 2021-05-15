@@ -1,24 +1,41 @@
-﻿using FedoraDev.TimCo.DataManager.Library.Const;
+﻿using FedoraDev.TimCo.Data.API.Data;
+using FedoraDev.TimCo.Data.API.Models;
+using FedoraDev.TimCo.DataManager.Library.Const;
 using FedoraDev.TimCo.DataManager.Library.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
-using FedoraDev.TimCo.DataManager.Models;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Http;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
-namespace FedoraDev.TimCo.DataManager.Controllers
+namespace FedoraDev.TimCo.Data.API.Controllers
 {
 	[Authorize]
-    public class UserController : ApiController
-    {
-		#region Get
-		[HttpGet]
+    [Route("api/[controller]")]
+	[ApiController]
+	public class UserController : ControllerBase
+	{
+		private readonly ApplicationDbContext _dbContext;
+		private readonly UserManager<IdentityUser> _userManager;
+		private readonly IConfiguration _configuration;
+
+		public UserController(ApplicationDbContext dbContext, UserManager<IdentityUser> userManager, IConfiguration configuration)
+		{
+			_dbContext = dbContext;
+			_userManager = userManager;
+			_configuration = configuration;
+		}
+
+        #region Get
+        [HttpGet]
         public IEnumerable<UserModel> GetById()
         {
-            string id = RequestContext.Principal.Identity.GetUserId();
-            UserData userData = new UserData();
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            UserData userData = new UserData(_configuration);
 
             return userData.GetUserById(id);
         }
@@ -26,72 +43,54 @@ namespace FedoraDev.TimCo.DataManager.Controllers
         [HttpGet, Route("api/User/Admin/GetAll")]
         [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
         public List<ApplicationUserModel> GetAllUsers()
-		{
+        {
             List<ApplicationUserModel> userModels = new List<ApplicationUserModel>();
 
-            using (ApplicationDbContext context = new ApplicationDbContext())
+            List<IdentityUser> users = _userManager.Users.ToList();
+            var userRoles = from user in _dbContext.UserRoles
+                            join role in _dbContext.Roles on user.RoleId equals role.Id
+                            select new { user.UserId, user.RoleId, role.Name };
+
+            foreach (IdentityUser user in users)
             {
-                UserStore<ApplicationUser> userStore = new UserStore<ApplicationUser>(context);
-				UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(userStore);
+                ApplicationUserModel userModel = new ApplicationUserModel()
+                {
+                    Id = user.Id,
+                    EmailAddress = user.Email
+                };
 
-				List<ApplicationUser> users = userManager.Users.ToList();
-				List<IdentityRole> roles = context.Roles.ToList();
+                userModel.Roles = userRoles.Where(role => role.UserId == user.Id).ToDictionary(key => key.RoleId, value => value.Name);
 
-				foreach (ApplicationUser user in users)
-				{
-                    ApplicationUserModel userModel = new ApplicationUserModel()
-                    {
-                        Id = user.Id,
-                        EmailAddress = user.Email
-                    };
-
-					foreach (IdentityUserRole role in user.Roles)
-					{
-                        userModel.Roles.Add(role.RoleId, roles.Where(r => r.Id == role.RoleId).First().Name);
-					}
-
-                    userModels.Add(userModel);
-				}
+                userModels.Add(userModel);
             }
 
             return userModels;
-		}
+        }
 
         [HttpGet, Route("api/User/Admin/GetAllRoles")]
         [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
         public Dictionary<string, string> GetAllRoles()
-		{
-            using (ApplicationDbContext context = new ApplicationDbContext())
-                return context.Roles.ToDictionary(role => role.Id, role => role.Name);
-		}
-		#endregion
+        {
+            return _dbContext.Roles.ToDictionary(role => role.Id, role => role.Name);
+        }
+        #endregion
 
-		#region Post
-		[HttpPost, Route("api/User/Admin/AddRole")]
+        #region Post
+        [HttpPost, Route("api/User/Admin/AddRole")]
         [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
-        public void AddRole(UserRolePairModel userRolePair)
-		{
-            using (ApplicationDbContext context = new ApplicationDbContext())
-			{
-                UserStore<ApplicationUser> userStore = new UserStore<ApplicationUser>(context);
-                UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(userStore);
-
-                _ = userManager.AddToRole(userRolePair.UserId, userRolePair.RoleName);
-            }
-		}
+        public async Task AddRole(UserRolePairModel userRolePair)
+        {
+            IdentityUser user = await _userManager.FindByIdAsync(userRolePair.UserId);
+			_ = await _userManager.AddToRoleAsync(user, userRolePair.RoleName);
+        }
 
         [HttpPost, Route("api/User/Admin/RemoveRole")]
         [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
-        public void RemoveRole(UserRolePairModel userRolePair)
+        public async Task RemoveRole(UserRolePairModel userRolePair)
         {
-            using (ApplicationDbContext context = new ApplicationDbContext())
-            {
-                UserStore<ApplicationUser> userStore = new UserStore<ApplicationUser>(context);
-                UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(userStore);
-
-                _ = userManager.RemoveFromRole(userRolePair.UserId, userRolePair.RoleName);
-            }
+            IdentityUser user = await _userManager.FindByIdAsync(userRolePair.UserId);
+            _ = await _userManager.RemoveFromRoleAsync(user, userRolePair.RoleName);
         }
-		#endregion
-	}
+        #endregion
+    }
 }

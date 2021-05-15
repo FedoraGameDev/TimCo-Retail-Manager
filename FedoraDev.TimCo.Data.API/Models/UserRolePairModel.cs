@@ -1,4 +1,4 @@
-﻿namespace FedoraDev.TimCo.DataManager.Models
+﻿namespace FedoraDev.TimCo.Data.API.Models
 {
 	public class UserRolePairModel
 	{

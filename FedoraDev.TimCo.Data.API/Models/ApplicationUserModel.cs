@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
-namespace FedoraDev.TimCo.DataManager.Models
+namespace FedoraDev.TimCo.Data.API.Models
 {
 	public class ApplicationUserModel
 	{

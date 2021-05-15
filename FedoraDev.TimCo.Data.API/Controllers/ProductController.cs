@@ -1,18 +1,29 @@
 ﻿using FedoraDev.TimCo.DataManager.Library.Const;
 using FedoraDev.TimCo.DataManager.Library.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
-using System.Web.Http;
 
-namespace FedoraDev.TimCo.DataManager.Controllers
+namespace FedoraDev.TimCo.Data.API.Controllers
 {
 	[Authorize(Roles = Roles.CASHIER)]
-	public class ProductController : ApiController
+	[Route("api/[controller]")]
+	[ApiController]
+	public class ProductController : ControllerBase
 	{
+		private readonly IConfiguration _configuration;
+
+		public ProductController(IConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
+
 		[HttpGet]
 		public IEnumerable<ProductModel> Get()
 		{
-			ProductData productData = new ProductData();
+			ProductData productData = new ProductData(_configuration);
 
 			return productData.GetProducts();
 		}
