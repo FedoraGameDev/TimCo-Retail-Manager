@@ -96,6 +96,8 @@
     <Compile Include="EventModels\LoginEvent.cs" />
     <Compile Include="EventModels\LogoutEvent.cs" />
     <Compile Include="Helpers\PasswordBoxHelper.cs" />
+    <Compile Include="MockViewModels\MockSalesVM.cs" />
+    <Compile Include="MockViewModels\MockUserDisplayVM.cs" />
     <Compile Include="Models\CartItemWPFModel.cs" />
     <Compile Include="Models\ProductWPFModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FedoraDev.TimCo.UserInterface.WPF.Views"
+			 d:DataContext="{StaticResource ResourceKey=MockSalesVM}"
              mc:Ignorable="d" FontSize="24"
              d:DesignHeight="550" d:DesignWidth="800">
 	<Grid>
@@ -39,7 +40,8 @@
 			Grid.RowSpan="5"
 			MinHeight="200"
 			MinWidth="150"
-			SelectedItem="{Binding SelectedProduct}">
+			SelectedItem="{Binding SelectedProduct}"
+			ItemsSource="{Binding Path=Products}">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
 					<StackPanel Orientation="Vertical">
@@ -75,7 +77,8 @@
 			Grid.Column="3"
 			MinHeight="200"
 			MinWidth="150"
-			SelectedItem="{Binding SelectedCartItem}">
+			SelectedItem="{Binding SelectedCartItem}"
+			ItemsSource="{Binding Path=Cart}">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
 					<TextBlock Text="{Binding DisplayText}"/>
