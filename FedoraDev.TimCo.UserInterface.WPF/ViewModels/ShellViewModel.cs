@@ -2,6 +2,8 @@
 using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
 using FedoraDev.TimCo.UserInterface.WPF.EventModels;
+using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 {
@@ -13,6 +15,12 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private readonly IAPIHelper _apiHelper;
 
 		public bool IsLoggedIn => !string.IsNullOrWhiteSpace(_loggedInUser.Token);
+		public BitmapSource AppIcon {
+			get
+			{
+				return null;
+			}
+		}
 
 		public ShellViewModel(SalesViewModel salesVM, ILoggedInUserModel loggedInUser, IEventAggregator events, IAPIHelper apiHelper)
 		{

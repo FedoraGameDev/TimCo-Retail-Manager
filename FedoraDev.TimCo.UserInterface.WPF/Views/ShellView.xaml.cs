@@ -22,6 +22,9 @@ namespace FedoraDev.TimCo.UserInterface.WPF.Views
 		public ShellView()
 		{
 			InitializeComponent();
+			this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
 		}
+
+		public void WindowSizeChanged(object sender, SizeChangedEventArgs args) => BorderThickness = WindowState == WindowState.Maximized ? new Thickness(7) : new Thickness(0);
 	}
 }

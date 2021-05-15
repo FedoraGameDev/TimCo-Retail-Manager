@@ -3,20 +3,57 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:FedoraDev.TimCo.UserInterface.WPF.Views"
-        mc:Ignorable="d" FontSize="18"
-        Title="TimCo Retail Manager" Height="600" Width="1000">
-    <DockPanel>
-		<Menu DockPanel.Dock="Top" FontSize="18">
-			<MenuItem Header="_File">
-				<MenuItem x:Name="ExitApplication" Header="E_xit" />
-			</MenuItem>
-			<MenuItem Header="_Account" Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
-				<MenuItem x:Name="Logout" Header="_Logout" />
-			</MenuItem>
-		</Menu>
-		<Grid>
-			<ContentControl x:Name="ActiveItem" Margin="20 5 20 20" />
-		</Grid>
-	</DockPanel>
+		xmlns:viewmodels="clr-namespace:FedoraDev.TimCo.UserInterface.WPF.ViewModels"
+		xmlns:local="clr-namespace:FedoraDev.TimCo.UserInterface.WPF.Controls"
+		d:DataContext="{d:DesignInstance Type=viewmodels:ShellViewModel}"
+		mc:Ignorable="d" FontSize="18"
+		WindowStyle="None"
+		Background="Transparent" AllowsTransparency="True"
+		Foreground="White"
+        Title="TimCo Retail Manager"
+		SizeChanged="WindowSizeChanged"
+		Height="600" Width="1000">
+	<WindowChrome.WindowChrome>
+		<WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" />
+	</WindowChrome.WindowChrome>
+
+	<Border Background="#3F3F3F" CornerRadius="3">
+		<DockPanel>
+			<Grid DockPanel.Dock="Top" Height="32">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="auto"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+
+				<StackPanel Orientation="Horizontal" Grid.Column="0">
+					<Border Height="32" Width="32">
+						<Image Source="pack://siteoforigin:,,,/TimCo.ico" Height="16" HorizontalAlignment="center" />
+						<!--<Image Source="pack://application:,,,/FedoraDev.TimCo.UserInterface.Library;Component/Resources/TimCo.ico" Height="16" HorizontalAlignment="center" />-->
+					</Border>
+
+					<Menu FontSize="18" Background="Transparent" Foreground="White" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource MenuStyle}">
+						<MenuItem Header="_File" VerticalAlignment="Bottom" Height="32">
+							<MenuItem x:Name="ExitApplication" Header="E_xit" />
+						</MenuItem>
+						<MenuItem Header="_Account" Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+							<MenuItem x:Name="Logout" Header="_Logout" />
+						</MenuItem>
+					</Menu>
+				</StackPanel>
+
+				<Border Grid.Column="1" Height="32">
+					<TextBlock Text="{Binding Title,RelativeSource={RelativeSource FindAncestor,AncestorType=Window},FallbackValue=App}" VerticalAlignment="Center" />
+				</Border>
+
+				<Grid Grid.Column="2">
+					<local:WindowControl />
+				</Grid>
+			</Grid>
+
+			<Grid>
+				<ContentControl x:Name="ActiveItem" Margin="20 5 20 20" />
+			</Grid>
+		</DockPanel>
+	</Border>
 </Window>
