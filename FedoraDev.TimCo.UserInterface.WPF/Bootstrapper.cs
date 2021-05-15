@@ -37,6 +37,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF
 
 			_ = _container
 				.PerRequest<IProductEndpoint, ProductEndpoint>()
+				.PerRequest<IUserEndpoint, UserEndpoint>()
 				.PerRequest<ISaleEndpoint, SaleEndpoint>();
 
 			_ = _container

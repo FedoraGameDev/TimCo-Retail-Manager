@@ -11,6 +11,12 @@
 			</ResourceDictionary.MergedDictionaries>
 			<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
+			<Style x:Key="Header" TargetType="TextBlock">
+				<Setter Property="FontSize" Value="48" />
+				<Setter Property="HorizontalAlignment" Value="Center" />
+				<Setter Property="Margin" Value="0 0 0 10" />
+			</Style>
+
 			<SolidColorBrush x:Key="MouseOverOverlayBackgroundBrush" Color="#555555" />
 			<SolidColorBrush x:Key="MouseOverOverlayForegroundBrush" Color="White" />
 			<SolidColorBrush x:Key="PressedOverlayBackgroundBrush" Color="#666666" />

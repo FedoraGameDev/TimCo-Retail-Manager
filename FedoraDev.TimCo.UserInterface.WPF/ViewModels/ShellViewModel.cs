@@ -15,12 +15,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private readonly IAPIHelper _apiHelper;
 
 		public bool IsLoggedIn => !string.IsNullOrWhiteSpace(_loggedInUser.Token);
-		public BitmapSource AppIcon {
-			get
-			{
-				return null;
-			}
-		}
+		public bool CanViewUsers => true;
 
 		public ShellViewModel(SalesViewModel salesVM, ILoggedInUserModel loggedInUser, IEventAggregator events, IAPIHelper apiHelper)
 		{
@@ -49,6 +44,11 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			_apiHelper.LogoutUser();
 			ActivateItem(IoC.Get<LoginViewModel>());
 			NotifyOfPropertyChange(() => IsLoggedIn);
+		}
+
+		public void ViewUsersPage()
+		{
+			ActivateItem(IoC.Get<UserDisplayViewModel>());
 		}
 	}
 }

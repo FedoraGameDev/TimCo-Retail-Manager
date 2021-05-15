@@ -39,6 +39,9 @@
 						<MenuItem Header="_Account" Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
 							<MenuItem x:Name="Logout" Header="_Logout" />
 						</MenuItem>
+						<MenuItem Header="_Users" Visibility="{Binding CanViewUsers, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+							<MenuItem x:Name="ViewUsersPage" Header="User _Management" />
+						</MenuItem>
 					</Menu>
 				</StackPanel>
 

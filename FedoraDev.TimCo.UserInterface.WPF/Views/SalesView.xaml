@@ -28,7 +28,7 @@
 		</Grid.RowDefinitions>
 
 		<!-- Header -->
-		<TextBlock Text="Sales Page" Grid.Row="0" Grid.ColumnSpan="6" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10" />
+		<TextBlock Text="Sales Page" Grid.Row="0" Grid.ColumnSpan="6" Style="{StaticResource Header}" />
 
 		<!-- Products List -->
 		<TextBlock Text="Items" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1" />

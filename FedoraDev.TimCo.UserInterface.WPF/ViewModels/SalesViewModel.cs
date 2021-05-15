@@ -21,7 +21,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private readonly ISaleEndpoint _saleEndpoint;
 		private readonly IMapper _mapper;
 		private readonly IConfigHelper _configHelper;
-		private readonly IWindowManager _window;
+		private readonly IWindowManager _windowManager;
 		private BindingList<CartItemWPFModel> _cart;
 		private BindingList<ProductWPFModel> _products;
 		private int _itemQuantity = 1;
@@ -89,13 +89,13 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		#endregion
 
 		#region Life Cycle
-		public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IMapper mapper, IConfigHelper configHelper, IWindowManager window)
+		public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IMapper mapper, IConfigHelper configHelper, IWindowManager windowManager)
 		{
 			_productEndpoint = productEndpoint;
 			_saleEndpoint = saleEndpoint;
 			_mapper = mapper;
 			_configHelper = configHelper;
-			_window = window;
+			_windowManager = windowManager;
 			Cart = new BindingList<CartItemWPFModel>();
 		}
 
@@ -118,7 +118,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 					settings.Title = "Authorization Error";
 
 					infoViewModel.UpdateMessage("Unauthorized Access", "You are not authorized to interact with the sales form.");
-					_window.ShowDialog(infoViewModel, null, settings);
+					_windowManager.ShowDialog(infoViewModel, null, settings);
 					TryClose(); 
 				}
 				else
@@ -126,7 +126,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 					settings.Title = "Fatal Exception";
 
 					infoViewModel.UpdateMessage("Fatal Exception", ex.Message);
-					_window.ShowDialog(infoViewModel, null, settings);
+					_windowManager.ShowDialog(infoViewModel, null, settings);
 				}
 			}
 		}
