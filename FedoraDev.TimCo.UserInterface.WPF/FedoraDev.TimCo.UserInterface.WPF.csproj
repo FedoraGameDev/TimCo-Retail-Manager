@@ -100,6 +100,7 @@
     <Compile Include="MockViewModels\MockUserDisplayVM.cs" />
     <Compile Include="Models\CartItemWPFModel.cs" />
     <Compile Include="Models\ProductWPFModel.cs" />
+    <Compile Include="Models\UserWPFModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\SalesViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />

@@ -11,26 +11,29 @@
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="*" />
 			<ColumnDefinition Width="auto" />
+			<ColumnDefinition Width="auto"/>
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
 			<RowDefinition Height="auto" />
 			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 		
 		<!-- Header -->
-		<TextBlock Text="User Administration" Grid.Row="0" Grid.ColumnSpan="3" Style="{StaticResource Header}" />
+		<TextBlock Text="User Administration" Grid.Row="0" Grid.ColumnSpan="4" Style="{StaticResource Header}" />
 		
 		<!-- User List -->
-		<TextBlock Text="Users" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" />
+		<TextBlock Text="Users" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Margin="0 0 0 10" />
 		<ListBox
 			x:Name="Users"
 			Grid.Row="2"
 			Grid.Column="1"
 			MinHeight="200"
 			MinWidth="250"
-			ItemsSource="{Binding Path=Users}">
+			ItemsSource="{Binding Path=Users}"
+			SelectedItem="{Binding SelectedUser}">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
 					<StackPanel Orientation="Vertical">
@@ -40,5 +43,19 @@
 				</DataTemplate>
 			</ListBox.ItemTemplate>
 		</ListBox>
+		
+		<!-- Role List -->
+		<StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" Margin="10 0 0 0">
+			<TextBlock x:Name="SelectedUserName" HorizontalAlignment="Center" />
+			<TextBlock Text="Current Roles" HorizontalAlignment="Center" />
+			<StackPanel Orientation="Horizontal">
+				<ListBox x:Name="SelectedUserRoles" SelectedItem="{Binding RoleToRemove}" MinWidth="100" />
+				<Button x:Name="RemoveSelectedRole" Content="Remove" Margin="5 0 0 0" />
+			</StackPanel>
+			<StackPanel Orientation="Horizontal">
+				<ComboBox x:Name="AvailableRoles" SelectedItem="{Binding RoleToAdd}" MinWidth="100" />
+				<Button x:Name="AddSelectedRole" Content="Add" Margin="5 0 0 0" />
+			</StackPanel>
+		</StackPanel>
 	</Grid>
 </UserControl>

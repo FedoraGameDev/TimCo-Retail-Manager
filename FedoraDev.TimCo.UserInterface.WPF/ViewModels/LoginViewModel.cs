@@ -17,8 +17,6 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private string _userName;
 		private string _password;
 #endif
-		private IAPIHelper _apiHelper;
-		private IEventAggregator _events;
 		private string _errorMessage;
 		#endregion
 
@@ -60,22 +58,17 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		}
 		#endregion
 
-		public LoginViewModel(IAPIHelper apiHelper, IEventAggregator events)
-		{
-			_apiHelper = apiHelper;
-			_events = events;
-		}
-
 		public async Task Login()
 		{
 			try
 			{
 				ErrorMessage = string.Empty;
-				AuthenticatedUser aUser = await _apiHelper.Authenticate(UserName, Password);
+				IAPIHelper apiHelper = IoC.Get<IAPIHelper>();
+				AuthenticatedUser aUser = await apiHelper.Authenticate(UserName, Password);
 
-				await _apiHelper.SetLoggedInUserInfo(aUser.Access_Token);
+				await apiHelper.SetLoggedInUserInfo(aUser.Access_Token);
 
-				_events.PublishOnUIThread(new LoginEvent());
+				IoC.Get<IEventAggregator>().PublishOnUIThread(new LoginEvent());
 			}
 			catch (Exception exception)
 			{

@@ -17,11 +17,6 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 	public class SalesViewModel : Screen
 	{
 		#region Fields
-		private readonly IProductEndpoint _productEndpoint;
-		private readonly ISaleEndpoint _saleEndpoint;
-		private readonly IMapper _mapper;
-		private readonly IConfigHelper _configHelper;
-		private readonly IWindowManager _windowManager;
 		private BindingList<CartItemWPFModel> _cart;
 		private BindingList<ProductWPFModel> _products;
 		private int _itemQuantity = 1;
@@ -89,13 +84,8 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		#endregion
 
 		#region Life Cycle
-		public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IMapper mapper, IConfigHelper configHelper, IWindowManager windowManager)
+		public SalesViewModel()
 		{
-			_productEndpoint = productEndpoint;
-			_saleEndpoint = saleEndpoint;
-			_mapper = mapper;
-			_configHelper = configHelper;
-			_windowManager = windowManager;
 			Cart = new BindingList<CartItemWPFModel>();
 		}
 
@@ -118,7 +108,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 					settings.Title = "Authorization Error";
 
 					infoViewModel.UpdateMessage("Unauthorized Access", "You are not authorized to interact with the sales form.");
-					_windowManager.ShowDialog(infoViewModel, null, settings);
+					IoC.Get<IWindowManager>().ShowDialog(infoViewModel, null, settings);
 					TryClose(); 
 				}
 				else
@@ -126,15 +116,15 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 					settings.Title = "Fatal Exception";
 
 					infoViewModel.UpdateMessage("Fatal Exception", ex.Message);
-					_windowManager.ShowDialog(infoViewModel, null, settings);
+					IoC.Get<IWindowManager>().ShowDialog(infoViewModel, null, settings);
 				}
 			}
 		}
 
 		private async Task LoadProducts()
 		{
-			List<ProductModel> productList = await _productEndpoint.GetAll();
-			List<ProductWPFModel> products = _mapper.Map<List<ProductWPFModel>>(productList);
+			List<ProductModel> productList = await IoC.Get<IProductEndpoint>().GetAll();
+			List<ProductWPFModel> products = IoC.Get<IMapper>().Map<List<ProductWPFModel>>(productList);
 			Products = new BindingList<ProductWPFModel>(products);
 		}
 
@@ -205,8 +195,8 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 				});
 			}
 
-			await _saleEndpoint.PostSale(sale);
-			ResetSalesViewModel();
+			await IoC.Get<ISaleEndpoint>().PostSale(sale);
+			await ResetSalesViewModel();
 		}
 		#endregion
 
@@ -222,7 +212,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private decimal CalculateTax()
 		{
 			decimal taxAmount = 0;
-			decimal taxRate = _configHelper.GetTaxRate();
+			decimal taxRate = IoC.Get<IConfigHelper>().GetTaxRate();
 
 			taxAmount = Cart
 				.Where(item => item.Product.Taxable)

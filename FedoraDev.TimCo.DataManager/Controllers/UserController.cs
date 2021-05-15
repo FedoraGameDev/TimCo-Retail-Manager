@@ -13,7 +13,8 @@ namespace FedoraDev.TimCo.DataManager.Controllers
 	[Authorize]
     public class UserController : ApiController
     {
-        [HttpGet]
+		#region Get
+		[HttpGet]
         public IEnumerable<UserModel> GetById()
         {
             string id = RequestContext.Principal.Identity.GetUserId();
@@ -55,5 +56,42 @@ namespace FedoraDev.TimCo.DataManager.Controllers
 
             return userModels;
 		}
-    }
+
+        [HttpGet, Route("api/User/Admin/GetAllRoles")]
+        [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
+        public Dictionary<string, string> GetAllRoles()
+		{
+            using (ApplicationDbContext context = new ApplicationDbContext())
+                return context.Roles.ToDictionary(role => role.Id, role => role.Name);
+		}
+		#endregion
+
+		#region Post
+		[HttpPost, Route("api/User/Admin/AddRole")]
+        [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
+        public void AddRole(UserRolePairModel userRolePair)
+		{
+            using (ApplicationDbContext context = new ApplicationDbContext())
+			{
+                UserStore<ApplicationUser> userStore = new UserStore<ApplicationUser>(context);
+                UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(userStore);
+
+                _ = userManager.AddToRole(userRolePair.UserId, userRolePair.RoleName);
+            }
+		}
+
+        [HttpPost, Route("api/User/Admin/RemoveRole")]
+        [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
+        public void RemoveRole(UserRolePairModel userRolePair)
+        {
+            using (ApplicationDbContext context = new ApplicationDbContext())
+            {
+                UserStore<ApplicationUser> userStore = new UserStore<ApplicationUser>(context);
+                UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(userStore);
+
+                _ = userManager.RemoveFromRole(userRolePair.UserId, userRolePair.RoleName);
+            }
+        }
+		#endregion
+	}
 }

@@ -60,6 +60,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF
 			MapperConfiguration config = new MapperConfiguration(cfg => {
 				_ = cfg.CreateMap<ProductModel, ProductWPFModel>();
 				_ = cfg.CreateMap<CartItemModel, CartItemWPFModel>();
+				_ = cfg.CreateMap<UserModel, UserWPFModel>();
 			});
 
 			return config.CreateMapper();
