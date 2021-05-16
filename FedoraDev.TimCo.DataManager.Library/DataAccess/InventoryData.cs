@@ -1,32 +1,27 @@
 ﻿using FedoraDev.TimCo.DataManager.Library.Internal.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
-using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 
 namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 {
-	public class InventoryData
+	public class InventoryData : IInventoryData
 	{
-		private readonly IConfiguration _configuration;
+		private readonly ISqlDataAccess _sqlDataAccess;
 
-		public InventoryData(IConfiguration configuration)
+		public InventoryData(ISqlDataAccess sqlDataAccess)
 		{
-			_configuration = configuration;
+			_sqlDataAccess = sqlDataAccess;
 		}
 
 		public List<InventoryModel> GetInventory()
 		{
-			SqlDataAccess sql = new SqlDataAccess(_configuration);
-
 			var parameters = new { };
-			return sql.LoadData<InventoryModel, dynamic>("spInventoryGetAll", parameters, "TimCo-Data");
+			return _sqlDataAccess.LoadData<InventoryModel, dynamic>("TimCo-Data", "spInventoryGetAll", parameters);
 		}
 
 		public void SaveInventoryItem(InventoryModel itemData)
 		{
-			SqlDataAccess sql = new SqlDataAccess(_configuration);
-
-			sql.SaveData("spInventoryInsert", itemData, "TimCo-Data");
+			_sqlDataAccess.SaveData("spInventoryInsert", itemData, "TimCo-Data");
 		}
 	}
 

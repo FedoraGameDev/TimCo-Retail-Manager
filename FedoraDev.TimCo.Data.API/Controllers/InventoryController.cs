@@ -3,7 +3,8 @@ using FedoraDev.TimCo.DataManager.Library.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 
 namespace FedoraDev.TimCo.Data.API.Controllers
@@ -13,18 +14,18 @@ namespace FedoraDev.TimCo.Data.API.Controllers
 	[ApiController]
 	public class InventoryController : ControllerBase
 	{
-		private readonly IConfiguration _configuration;
+		private readonly IServiceProvider _serviceProvider;
 
-		public InventoryController(IConfiguration configuration)
+		public InventoryController(IServiceProvider serviceProvider)
 		{
-			_configuration = configuration;
+			_serviceProvider = serviceProvider;
 		}
 
 		[HttpGet]
 		[Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
 		public List<InventoryModel> Get()
 		{
-			InventoryData inventory = new InventoryData(_configuration);
+			IInventoryData inventory = _serviceProvider.GetRequiredService<IInventoryData>();
 			return inventory.GetInventory();
 		}
 
@@ -32,7 +33,7 @@ namespace FedoraDev.TimCo.Data.API.Controllers
 		[Authorize(Roles = Roles.ADMIN)]
 		public void Post(InventoryModel itemData)
 		{
-			InventoryData inventory = new InventoryData(_configuration);
+			IInventoryData inventory = _serviceProvider.GetRequiredService<IInventoryData>();
 			inventory.SaveInventoryItem(itemData);
 		}
 	}

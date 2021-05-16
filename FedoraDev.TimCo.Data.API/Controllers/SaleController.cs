@@ -3,7 +3,8 @@ using FedoraDev.TimCo.DataManager.Library.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 
@@ -14,18 +15,18 @@ namespace FedoraDev.TimCo.Data.API.Controllers
 	[ApiController]
 	public class SaleController : ControllerBase
 	{
-		private readonly IConfiguration _configuration;
+		private readonly IServiceProvider _serviceProvider;
 
-		public SaleController(IConfiguration configuration)
+		public SaleController(IServiceProvider serviceProvider)
 		{
-			_configuration = configuration;
+			_serviceProvider = serviceProvider;
 		}
 
         [HttpPost]
         [Authorize(Roles = Roles.CASHIER)]
         public void Post(SaleModel sale)
         {
-            SaleData saleData = new SaleData(_configuration);
+            ISaleData saleData = _serviceProvider.GetRequiredService<ISaleData>();
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             saleData.SaveSale(sale, userId);
@@ -35,7 +36,7 @@ namespace FedoraDev.TimCo.Data.API.Controllers
         [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
         public List<SaleReportModel> GetSalesReport()
         {
-            SaleData saleData = new SaleData(_configuration);
+            ISaleData saleData = _serviceProvider.GetRequiredService<ISaleData>();
 
             return saleData.GetSaleReport();
         }

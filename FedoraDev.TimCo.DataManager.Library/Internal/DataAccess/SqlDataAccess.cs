@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace FedoraDev.TimCo.DataManager.Library.Internal.DataAccess
 {
-	internal class SqlDataAccess : IDisposable
+	public class SqlDataAccess : IDisposable, ISqlDataAccess
 	{
 		private IDbConnection _connection;
 		private IDbTransaction _transaction;
@@ -25,7 +25,7 @@ namespace FedoraDev.TimCo.DataManager.Library.Internal.DataAccess
 			return _configuration.GetConnectionString(name);
 		}
 
-		public List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)
+		public List<T> LoadData<T, U>(string connectionStringName, string storedProcedure, U parameters)
 		{
 			string connectionString = GetConnectionString(connectionStringName);
 
@@ -53,7 +53,8 @@ namespace FedoraDev.TimCo.DataManager.Library.Internal.DataAccess
 
 		public void StartTransaction(string connectionStringName)
 		{
-			if (!_isClosed) return;
+			if (!_isClosed)
+				return;
 
 			string connectionString = GetConnectionString(connectionStringName);
 
@@ -66,7 +67,8 @@ namespace FedoraDev.TimCo.DataManager.Library.Internal.DataAccess
 
 		public void CommitTransaction()
 		{
-			if (_isClosed) return;
+			if (_isClosed)
+				return;
 			_isClosed = true;
 
 			_transaction?.Commit();
@@ -75,7 +77,8 @@ namespace FedoraDev.TimCo.DataManager.Library.Internal.DataAccess
 
 		public void RollbackTransaction()
 		{
-			if (_isClosed) return;
+			if (_isClosed)
+				return;
 			_isClosed = true;
 
 			_transaction?.Rollback();

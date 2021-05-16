@@ -1,26 +1,22 @@
 ﻿using FedoraDev.TimCo.DataManager.Library.Internal.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
-using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 
 namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 {
-	public class UserData
+	public class UserData : IUserData
 	{
-		private readonly IConfiguration _configuration;
+		private readonly ISqlDataAccess _sqlDataAccess;
 
-		public UserData(IConfiguration configuration)
+		public UserData(ISqlDataAccess sqlDataAccess)
 		{
-			_configuration = configuration;
+			_sqlDataAccess = sqlDataAccess;
 		}
 
 		public List<UserModel> GetUserById(string id)
 		{
-			SqlDataAccess sql = new SqlDataAccess(_configuration);
-
 			var parameters = new { Id = id };
-
-			return sql.LoadData<UserModel, dynamic>("dbo.spUserLookup", parameters, "TimCo-Data");
+			return _sqlDataAccess.LoadData<UserModel, dynamic>("TimCo-Data", "dbo.spUserLookup", parameters);
 		}
 	}
 }

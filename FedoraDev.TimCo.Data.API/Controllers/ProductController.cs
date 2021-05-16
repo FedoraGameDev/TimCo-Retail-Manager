@@ -3,7 +3,8 @@ using FedoraDev.TimCo.DataManager.Library.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 
 namespace FedoraDev.TimCo.Data.API.Controllers
@@ -13,17 +14,17 @@ namespace FedoraDev.TimCo.Data.API.Controllers
 	[ApiController]
 	public class ProductController : ControllerBase
 	{
-		private readonly IConfiguration _configuration;
+		private readonly IServiceProvider _serviceProvider;
 
-		public ProductController(IConfiguration configuration)
+		public ProductController(IServiceProvider serviceProvider)
 		{
-			_configuration = configuration;
+			_serviceProvider = serviceProvider;
 		}
 
 		[HttpGet]
 		public IEnumerable<ProductModel> Get()
 		{
-			ProductData productData = new ProductData(_configuration);
+			IProductData productData = _serviceProvider.GetRequiredService<IProductData>();
 
 			return productData.GetProducts();
 		}

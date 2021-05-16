@@ -1,19 +1,20 @@
 ﻿using FedoraDev.TimCo.DataManager.Library.Internal.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 {
-	public class SaleData
+	public class SaleData : ISaleData
 	{
-		private readonly IConfiguration _configuration;
+		private readonly ISqlDataAccess _sqlDataAccess;
+		private readonly IProductData _productData;
 
-		public SaleData(IConfiguration configuration)
+		public SaleData(ISqlDataAccess sqlDataAccess, IProductData productData)
 		{
-			_configuration = configuration;
+			_sqlDataAccess = sqlDataAccess;
+			_productData = productData;
 		}
 
 		public void SaveSale(SaleModel saleInfo, string cashierId)
@@ -26,10 +27,8 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 
 		public List<SaleReportModel> GetSaleReport()
 		{
-			SqlDataAccess sql = new SqlDataAccess(_configuration);
-
 			var parameters = new { };
-			return sql.LoadData<SaleReportModel, dynamic>("dbo.spSaleReport", parameters, "TimCo-Data");
+			return _sqlDataAccess.LoadData<SaleReportModel, dynamic>("TimCo-Data", "dbo.spSaleReport", parameters);
 		}
 
 		private SaleDBModel GenerateSale(string cashierId, List<SaleDetailDBModel> saleDetails)
@@ -44,12 +43,10 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 
 		private List<SaleDetailDBModel> GenerateSaleDetails(SaleModel saleInfo)
 		{
-			ProductData product = new ProductData(_configuration);
-
 			List<SaleDetailDBModel> saleDetails = new List<SaleDetailDBModel>();
 			foreach (SaleDetailModel saleDetail in saleInfo.SaleDetails)
 			{
-				ProductModel productInfo = product.GetProductById(saleDetail.ProductId);
+				ProductModel productInfo = _productData.GetProductById(saleDetail.ProductId);
 
 				if (productInfo == null)
 					throw new Exception($"The ProductId '{saleDetail.ProductId}' could not be found in the database.");
@@ -71,29 +68,26 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 
 		private void SaveToDatabase(List<SaleDetailDBModel> saleDetails, SaleDBModel sale)
 		{
-			using (SqlDataAccess sql = new SqlDataAccess(_configuration))
+			try
 			{
-				try
+				_sqlDataAccess.StartTransaction("TimCo-Data");
+				_sqlDataAccess.SaveDataInTransaction("dbo.spSaleInsert", sale);
+
+				var parameters = new { sale.CashierId, sale.SaleDate };
+				sale.Id = _sqlDataAccess.LoadDataInTransaction<int, dynamic>("dbo.spSaleLookup", parameters).FirstOrDefault();
+
+				foreach (SaleDetailDBModel saleDetail in saleDetails)
 				{
-					sql.StartTransaction("TimCo-Data");
-					sql.SaveDataInTransaction("dbo.spSaleInsert", sale);
-
-					var parameters = new { sale.CashierId, sale.SaleDate };
-					sale.Id = sql.LoadDataInTransaction<int, dynamic>("dbo.spSaleLookup", parameters).FirstOrDefault();
-
-					foreach (SaleDetailDBModel saleDetail in saleDetails)
-					{
-						saleDetail.SaleId = sale.Id;
-						sql.SaveDataInTransaction("dbo.spSaleDetailInsert", saleDetail);
-					}
-
-					sql.CommitTransaction();
+					saleDetail.SaleId = sale.Id;
+					_sqlDataAccess.SaveDataInTransaction("dbo.spSaleDetailInsert", saleDetail);
 				}
-				catch
-				{
-					sql.RollbackTransaction();
-					throw;
-				}
+
+				_sqlDataAccess.CommitTransaction();
+			}
+			catch
+			{
+				_sqlDataAccess.RollbackTransaction();
+				throw;
 			}
 		}
 	}

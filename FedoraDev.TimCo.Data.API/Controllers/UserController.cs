@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -21,13 +23,13 @@ namespace FedoraDev.TimCo.Data.API.Controllers
 	{
 		private readonly ApplicationDbContext _dbContext;
 		private readonly UserManager<IdentityUser> _userManager;
-		private readonly IConfiguration _configuration;
+		private readonly IServiceProvider _serviceProvider;
 
-		public UserController(ApplicationDbContext dbContext, UserManager<IdentityUser> userManager, IConfiguration configuration)
-		{
+		public UserController(IServiceProvider serviceProvider, ApplicationDbContext dbContext, UserManager<IdentityUser> userManager)
+        {
+			_serviceProvider = serviceProvider;
 			_dbContext = dbContext;
 			_userManager = userManager;
-			_configuration = configuration;
 		}
 
         #region Get
@@ -35,7 +37,7 @@ namespace FedoraDev.TimCo.Data.API.Controllers
         public IEnumerable<UserModel> GetById()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            UserData userData = new UserData(_configuration);
+            IUserData userData = _serviceProvider.GetRequiredService<IUserData>();
 
             return userData.GetUserById(id);
         }

@@ -6,31 +6,25 @@ using System.Linq;
 
 namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 {
-	public class ProductData
+	public class ProductData : IProductData
 	{
-		private readonly IConfiguration _configuration;
+		private readonly ISqlDataAccess _sqlDataAccess;
 
-		public ProductData(IConfiguration configuration)
+		public ProductData(ISqlDataAccess sqlDataAccess)
 		{
-			_configuration = configuration;
+			_sqlDataAccess = sqlDataAccess;
 		}
 
 		public List<ProductModel> GetProducts()
 		{
-			SqlDataAccess sql = new SqlDataAccess(_configuration);
-
 			var parameters = new { };
-
-			return sql.LoadData<ProductModel, dynamic>("dbo.spProductGetAll", parameters, "TimCo-Data");
+			return _sqlDataAccess.LoadData<ProductModel, dynamic>("TimCo-Data", "dbo.spProductGetAll", parameters);
 		}
 
 		public ProductModel GetProductById(int productId)
 		{
-			SqlDataAccess sql = new SqlDataAccess(_configuration);
-
 			var parameters = new { Id = productId };
-
-			return sql.LoadData<ProductModel, dynamic>("dbo.spProductGetById", parameters, "TimCo-Data").FirstOrDefault();
+			return _sqlDataAccess.LoadData<ProductModel, dynamic>("TimCo-Data", "dbo.spProductGetById", parameters).FirstOrDefault();
 		}
 	}
 }
