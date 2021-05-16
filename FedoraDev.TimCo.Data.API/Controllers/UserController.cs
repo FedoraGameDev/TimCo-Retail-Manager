@@ -40,7 +40,7 @@ namespace FedoraDev.TimCo.Data.API.Controllers
             return userData.GetUserById(id);
         }
 
-        [HttpGet, Route("api/User/Admin/GetAll")]
+        [HttpGet, Route("Admin/GetAll")]
         [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
         public List<ApplicationUserModel> GetAllUsers()
         {
@@ -67,7 +67,7 @@ namespace FedoraDev.TimCo.Data.API.Controllers
             return userModels;
         }
 
-        [HttpGet, Route("api/User/Admin/GetAllRoles")]
+        [HttpGet, Route("Admin/GetAllRoles")]
         [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
         public Dictionary<string, string> GetAllRoles()
         {
@@ -76,7 +76,7 @@ namespace FedoraDev.TimCo.Data.API.Controllers
         #endregion
 
         #region Post
-        [HttpPost, Route("api/User/Admin/AddRole")]
+        [HttpPost, Route("Admin/AddRole")]
         [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
         public async Task AddRole(UserRolePairModel userRolePair)
         {
@@ -84,7 +84,7 @@ namespace FedoraDev.TimCo.Data.API.Controllers
 			_ = await _userManager.AddToRoleAsync(user, userRolePair.RoleName);
         }
 
-        [HttpPost, Route("api/User/Admin/RemoveRole")]
+        [HttpPost, Route("Admin/RemoveRole")]
         [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
         public async Task RemoveRole(UserRolePairModel userRolePair)
         {
