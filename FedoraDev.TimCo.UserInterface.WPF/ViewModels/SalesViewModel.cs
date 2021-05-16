@@ -108,15 +108,15 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 					settings.Title = "Authorization Error";
 
 					infoViewModel.UpdateMessage("Unauthorized Access", "You are not authorized to interact with the sales form.");
-					IoC.Get<IWindowManager>().ShowDialog(infoViewModel, null, settings);
-					TryClose(); 
+					await IoC.Get<IWindowManager>().ShowDialogAsync(infoViewModel, null, settings);
+					await TryCloseAsync();
 				}
 				else
 				{
 					settings.Title = "Fatal Exception";
 
 					infoViewModel.UpdateMessage("Fatal Exception", ex.Message);
-					IoC.Get<IWindowManager>().ShowDialog(infoViewModel, null, settings);
+					await IoC.Get<IWindowManager>().ShowDialogAsync(infoViewModel, null, settings);
 				}
 			}
 		}

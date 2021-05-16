@@ -2,6 +2,8 @@
 using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
 using FedoraDev.TimCo.UserInterface.WPF.EventModels;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 {
@@ -18,32 +20,33 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			_salesVM = salesVM;
 			_loggedInUser = loggedInUser;
 
-			IoC.Get<IEventAggregator>().Subscribe(this);
-			ActivateItem(IoC.Get<LoginViewModel>());
+			IoC.Get<IEventAggregator>().SubscribeOnPublishedThread(this);
+			_ = ActivateItemAsync(IoC.Get<LoginViewModel>(), new CancellationToken());
 		}
 
-		public void Handle(LoginEvent loginEvent)
+		public async Task HandleAsync(LoginEvent loginEvent, CancellationToken cancellationToken)
 		{
-			ActivateItem(_salesVM);
+			await ActivateItemAsync(_salesVM, cancellationToken);
 			NotifyOfPropertyChange(() => IsLoggedIn);
 		}
 
-		public void ExitApplication()
+		public async Task ExitApplication()
 		{
-			TryClose();
+			await TryCloseAsync();
 		}
 
-		public void Logout()
+		public async Task Logout()
 		{
 			_loggedInUser.Clear();
 			IoC.Get<IAPIHelper>().LogoutUser();
-			ActivateItem(IoC.Get<LoginViewModel>());
+			await ActivateItemAsync(IoC.Get<LoginViewModel>(), new CancellationToken());
 			NotifyOfPropertyChange(() => IsLoggedIn);
 		}
 
-		public void ViewUsersPage()
+		public async Task ViewUsersPage()
 		{
-			ActivateItem(IoC.Get<UserDisplayViewModel>());
+			await ActivateItemAsync(IoC.Get<UserDisplayViewModel>(), new CancellationToken());
 		}
+
 	}
 }
