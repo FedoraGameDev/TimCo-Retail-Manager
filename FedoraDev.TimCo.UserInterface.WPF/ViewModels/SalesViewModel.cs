@@ -3,12 +3,14 @@ using Caliburn.Micro;
 using FedoraDev.TimCo.UserInterface.Library.Api;
 using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
+using FedoraDev.TimCo.UserInterface.WPF.EventModels;
 using FedoraDev.TimCo.UserInterface.WPF.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -127,17 +129,6 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			List<ProductWPFModel> products = IoC.Get<IMapper>().Map<List<ProductWPFModel>>(productList);
 			Products = new BindingList<ProductWPFModel>(products);
 		}
-
-		private async Task ResetSalesViewModel()
-		{
-			Cart.Clear();
-			await LoadProducts();
-
-			NotifyOfPropertyChange(() => CanCheckout);
-			NotifyOfPropertyChange(() => SubTotal);
-			NotifyOfPropertyChange(() => Tax);
-			NotifyOfPropertyChange(() => Total);
-		}
 		#endregion
 
 		#region WPF Buttons
@@ -196,7 +187,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			}
 
 			await IoC.Get<ISaleEndpoint>().PostSale(sale);
-			await ResetSalesViewModel();
+			await IoC.Get<IEventAggregator>().PublishOnUIThreadAsync(new CheckoutEvent(), new CancellationToken());
 		}
 		#endregion
 

@@ -7,17 +7,15 @@ using System.Threading.Tasks;
 
 namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 {
-	public class ShellViewModel : Conductor<object>, IHandle<LoginEvent>
+	public class ShellViewModel : Conductor<object>, IHandle<LoginEvent>, IHandle<CheckoutEvent>
 	{
-		private readonly SalesViewModel _salesVM;
 		private readonly ILoggedInUserModel _loggedInUser;
 
 		public bool IsLoggedIn => !string.IsNullOrWhiteSpace(_loggedInUser.Token);
 		public bool CanViewUsers => true;
 
-		public ShellViewModel(SalesViewModel salesVM, ILoggedInUserModel loggedInUser)
+		public ShellViewModel(ILoggedInUserModel loggedInUser)
 		{
-			_salesVM = salesVM;
 			_loggedInUser = loggedInUser;
 
 			IoC.Get<IEventAggregator>().SubscribeOnPublishedThread(this);
@@ -26,8 +24,13 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 
 		public async Task HandleAsync(LoginEvent loginEvent, CancellationToken cancellationToken)
 		{
-			await ActivateItemAsync(_salesVM, cancellationToken);
+			await ActivateItemAsync(IoC.Get<SalesViewModel>(), cancellationToken);
 			NotifyOfPropertyChange(() => IsLoggedIn);
+		}
+
+		public async Task HandleAsync(CheckoutEvent checkoutEvent, CancellationToken cancellationToken)
+		{
+			await ActivateItemAsync(IoC.Get<SalesViewModel>(), cancellationToken);
 		}
 
 		public async Task ExitApplication()
