@@ -9,6 +9,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace FedoraDev.TimCo.Data.API.Controllers
 {
@@ -18,11 +20,13 @@ namespace FedoraDev.TimCo.Data.API.Controllers
 
 		private readonly ApplicationDbContext _dbContext;
 		private readonly UserManager<IdentityUser> _userManager;
+		private readonly IServiceProvider _serviceProvider;
 
-		public TokenController(ApplicationDbContext dbContext, UserManager<IdentityUser> userManager)
+		public TokenController(ApplicationDbContext dbContext, UserManager<IdentityUser> userManager, IServiceProvider serviceProvider)
 		{
 			_dbContext = dbContext;
 			_userManager = userManager;
+			_serviceProvider = serviceProvider;
 		}
 
 		[Route("/token")]
@@ -64,7 +68,7 @@ namespace FedoraDev.TimCo.Data.API.Controllers
 			foreach (var role in roles)
 				claims.Add(new Claim(ClaimTypes.Role, role.Name));
 
-			SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
+			SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_serviceProvider.GetRequiredService<IConfiguration>().GetValue<string>("Secrets:SecurityKey")));
 			SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 			JwtHeader header = new JwtHeader(credentials);
 			JwtPayload payload = new JwtPayload(claims);
