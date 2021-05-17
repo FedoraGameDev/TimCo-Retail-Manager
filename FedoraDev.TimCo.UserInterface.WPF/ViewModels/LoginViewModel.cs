@@ -3,6 +3,7 @@ using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
 using FedoraDev.TimCo.UserInterface.WPF.EventModels;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
@@ -68,7 +69,8 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 
 				await apiHelper.SetLoggedInUserInfo(aUser.Access_Token);
 
-				IoC.Get<IEventAggregator>().PublishOnUIThread(new LoginEvent());
+				await IoC.Get<IEventAggregator>().PublishOnUIThreadAsync(new LoginEvent(), new CancellationToken());
+				;
 			}
 			catch (Exception exception)
 			{

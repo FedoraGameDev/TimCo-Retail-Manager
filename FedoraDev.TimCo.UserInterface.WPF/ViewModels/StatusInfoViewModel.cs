@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using System.Threading.Tasks;
 
 namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 {
@@ -16,9 +17,9 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			NotifyOfPropertyChange(() => Message);
 		}
 
-		public void Close()
+		public async Task Close()
 		{
-			TryClose();
+			await TryCloseAsync();
 		}
 	}
 }

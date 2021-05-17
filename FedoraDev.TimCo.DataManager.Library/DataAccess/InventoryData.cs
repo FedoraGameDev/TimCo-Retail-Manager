@@ -4,21 +4,24 @@ using System.Collections.Generic;
 
 namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 {
-	public class InventoryData
+	public class InventoryData : IInventoryData
 	{
+		private readonly ISqlDataAccess _sqlDataAccess;
+
+		public InventoryData(ISqlDataAccess sqlDataAccess)
+		{
+			_sqlDataAccess = sqlDataAccess;
+		}
+
 		public List<InventoryModel> GetInventory()
 		{
-			SqlDataAccess sql = new SqlDataAccess();
-
 			var parameters = new { };
-			return sql.LoadData<InventoryModel, dynamic>("spInventoryGetAll", parameters, "TimCo-Data");
+			return _sqlDataAccess.LoadData<InventoryModel, dynamic>("TimCo-Data", "spInventoryGetAll", parameters);
 		}
 
 		public void SaveInventoryItem(InventoryModel itemData)
 		{
-			SqlDataAccess sql = new SqlDataAccess();
-
-			sql.SaveData("spInventoryInsert", itemData, "TimCo-Data");
+			_sqlDataAccess.SaveData("spInventoryInsert", itemData, "TimCo-Data");
 		}
 	}
 

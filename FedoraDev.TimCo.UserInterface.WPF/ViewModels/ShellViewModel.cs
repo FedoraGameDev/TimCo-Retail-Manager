@@ -2,48 +2,54 @@
 using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
 using FedoraDev.TimCo.UserInterface.WPF.EventModels;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 {
-	public class ShellViewModel : Conductor<object>, IHandle<LoginEvent>
+	public class ShellViewModel : Conductor<object>, IHandle<LoginEvent>, IHandle<CheckoutEvent>
 	{
-		private readonly SalesViewModel _salesVM;
 		private readonly ILoggedInUserModel _loggedInUser;
 
 		public bool IsLoggedIn => !string.IsNullOrWhiteSpace(_loggedInUser.Token);
 		public bool CanViewUsers => true;
 
-		public ShellViewModel(SalesViewModel salesVM, ILoggedInUserModel loggedInUser)
+		public ShellViewModel(ILoggedInUserModel loggedInUser)
 		{
-			_salesVM = salesVM;
 			_loggedInUser = loggedInUser;
 
-			IoC.Get<IEventAggregator>().Subscribe(this);
-			ActivateItem(IoC.Get<LoginViewModel>());
+			IoC.Get<IEventAggregator>().SubscribeOnPublishedThread(this);
+			_ = ActivateItemAsync(IoC.Get<LoginViewModel>(), new CancellationToken());
 		}
 
-		public void Handle(LoginEvent loginEvent)
+		public async Task HandleAsync(LoginEvent loginEvent, CancellationToken cancellationToken)
 		{
-			ActivateItem(_salesVM);
+			await ActivateItemAsync(IoC.Get<SalesViewModel>(), cancellationToken);
 			NotifyOfPropertyChange(() => IsLoggedIn);
 		}
 
-		public void ExitApplication()
+		public async Task HandleAsync(CheckoutEvent checkoutEvent, CancellationToken cancellationToken)
 		{
-			TryClose();
+			await ActivateItemAsync(IoC.Get<SalesViewModel>(), cancellationToken);
 		}
 
-		public void Logout()
+		public async Task ExitApplication()
+		{
+			await TryCloseAsync();
+		}
+
+		public async Task Logout()
 		{
 			_loggedInUser.Clear();
 			IoC.Get<IAPIHelper>().LogoutUser();
-			ActivateItem(IoC.Get<LoginViewModel>());
+			await ActivateItemAsync(IoC.Get<LoginViewModel>(), new CancellationToken());
 			NotifyOfPropertyChange(() => IsLoggedIn);
 		}
 
-		public void ViewUsersPage()
+		public async Task ViewUsersPage()
 		{
-			ActivateItem(IoC.Get<UserDisplayViewModel>());
+			await ActivateItemAsync(IoC.Get<UserDisplayViewModel>(), new CancellationToken());
 		}
+
 	}
 }

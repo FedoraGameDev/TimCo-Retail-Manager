@@ -3,12 +3,14 @@ using Caliburn.Micro;
 using FedoraDev.TimCo.UserInterface.Library.Api;
 using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
+using FedoraDev.TimCo.UserInterface.WPF.EventModels;
 using FedoraDev.TimCo.UserInterface.WPF.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -108,15 +110,15 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 					settings.Title = "Authorization Error";
 
 					infoViewModel.UpdateMessage("Unauthorized Access", "You are not authorized to interact with the sales form.");
-					IoC.Get<IWindowManager>().ShowDialog(infoViewModel, null, settings);
-					TryClose(); 
+					await IoC.Get<IWindowManager>().ShowDialogAsync(infoViewModel, null, settings);
+					await TryCloseAsync();
 				}
 				else
 				{
 					settings.Title = "Fatal Exception";
 
 					infoViewModel.UpdateMessage("Fatal Exception", ex.Message);
-					IoC.Get<IWindowManager>().ShowDialog(infoViewModel, null, settings);
+					await IoC.Get<IWindowManager>().ShowDialogAsync(infoViewModel, null, settings);
 				}
 			}
 		}
@@ -126,17 +128,6 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			List<ProductModel> productList = await IoC.Get<IProductEndpoint>().GetAll();
 			List<ProductWPFModel> products = IoC.Get<IMapper>().Map<List<ProductWPFModel>>(productList);
 			Products = new BindingList<ProductWPFModel>(products);
-		}
-
-		private async Task ResetSalesViewModel()
-		{
-			Cart.Clear();
-			await LoadProducts();
-
-			NotifyOfPropertyChange(() => CanCheckout);
-			NotifyOfPropertyChange(() => SubTotal);
-			NotifyOfPropertyChange(() => Tax);
-			NotifyOfPropertyChange(() => Total);
 		}
 		#endregion
 
@@ -196,7 +187,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			}
 
 			await IoC.Get<ISaleEndpoint>().PostSale(sale);
-			await ResetSalesViewModel();
+			await IoC.Get<IEventAggregator>().PublishOnUIThreadAsync(new CheckoutEvent(), new CancellationToken());
 		}
 		#endregion
 

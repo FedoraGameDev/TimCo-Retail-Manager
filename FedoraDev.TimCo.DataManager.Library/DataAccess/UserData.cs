@@ -4,15 +4,19 @@ using System.Collections.Generic;
 
 namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 {
-	public class UserData
+	public class UserData : IUserData
 	{
+		private readonly ISqlDataAccess _sqlDataAccess;
+
+		public UserData(ISqlDataAccess sqlDataAccess)
+		{
+			_sqlDataAccess = sqlDataAccess;
+		}
+
 		public List<UserModel> GetUserById(string id)
 		{
-			SqlDataAccess sql = new SqlDataAccess();
-
 			var parameters = new { Id = id };
-
-			return sql.LoadData<UserModel, dynamic>("dbo.spUserLookup", parameters, "TimCo-Data");
+			return _sqlDataAccess.LoadData<UserModel, dynamic>("TimCo-Data", "dbo.spUserLookup", parameters);
 		}
 	}
 }
