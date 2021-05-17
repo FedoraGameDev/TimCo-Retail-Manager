@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
@@ -37,6 +38,7 @@ namespace FedoraDev.TimCo.Data.API
 			AddTransientServices(services);
 			AddAuthentication(services);
 			AddSwagger(services);
+			AddLogging(services);
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -108,6 +110,11 @@ namespace FedoraDev.TimCo.Data.API
 			{
 				setup.SwaggerDoc("v1", new OpenApiInfo { Title = "TimCo Retail Manager API", Version = "v1" });
 			});
+		}
+
+		private void AddLogging(IServiceCollection services)
+		{
+			_ = services.AddLogging();
 		}
 		#endregion
 

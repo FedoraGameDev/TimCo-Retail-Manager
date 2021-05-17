@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -14,10 +15,12 @@ namespace FedoraDev.TimCo.DataManager.Library.Internal.DataAccess
 		private IDbTransaction _transaction;
 		private bool _isClosed = true;
 		private readonly IConfiguration _configuration;
+		private readonly ILogger<SqlDataAccess> _logger;
 
-		public SqlDataAccess(IConfiguration configuration)
+		public SqlDataAccess(IConfiguration configuration, ILogger<SqlDataAccess> logger)
 		{
 			_configuration = configuration;
+			_logger = logger;
 		}
 
 		public string GetConnectionString(string name)
@@ -93,9 +96,7 @@ namespace FedoraDev.TimCo.DataManager.Library.Internal.DataAccess
 			}
 			catch (Exception exception)
 			{
-				Console.WriteLine(exception.StackTrace);
-				Console.WriteLine(exception.Message);
-				throw;
+				_logger.LogError(exception, "Commit transaction failed during dispose.");
 			}
 
 			_transaction = null;

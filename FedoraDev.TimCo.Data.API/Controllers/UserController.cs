@@ -6,8 +6,8 @@ using FedoraDev.TimCo.DataManager.Library.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,22 +24,25 @@ namespace FedoraDev.TimCo.Data.API.Controllers
 		private readonly ApplicationDbContext _dbContext;
 		private readonly UserManager<IdentityUser> _userManager;
 		private readonly IServiceProvider _serviceProvider;
+        private readonly IUserData _userData;
+        private readonly ILogger<UserController> _logger;
 
 		public UserController(IServiceProvider serviceProvider, ApplicationDbContext dbContext, UserManager<IdentityUser> userManager)
         {
 			_serviceProvider = serviceProvider;
 			_dbContext = dbContext;
 			_userManager = userManager;
+
+            _userData = _serviceProvider.GetRequiredService<IUserData>();
+            _logger = _serviceProvider.GetRequiredService<ILogger<UserController>>();
 		}
 
         #region Get
         [HttpGet]
         public IEnumerable<UserModel> GetById()
         {
-            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            IUserData userData = _serviceProvider.GetRequiredService<IUserData>();
-
-            return userData.GetUserById(id);
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return _userData.GetUserById(userId);
         }
 
         [HttpGet, Route("Admin/GetAll")]
@@ -82,15 +85,25 @@ namespace FedoraDev.TimCo.Data.API.Controllers
         [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
         public async Task AddRole(UserRolePairModel userRolePair)
         {
+            string loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			UserModel loggedInUser = _userData.GetUserById(loggedInUserId).First();
             IdentityUser user = await _userManager.FindByIdAsync(userRolePair.UserId);
-			_ = await _userManager.AddToRoleAsync(user, userRolePair.RoleName);
+
+            _logger.LogInformation("ADMIN: {Admin} added user {User} to role {Role}.", loggedInUser.EmailAddress, user.Email, userRolePair.RoleName);
+
+            _ = await _userManager.AddToRoleAsync(user, userRolePair.RoleName);
         }
 
         [HttpPost, Route("Admin/RemoveRole")]
         [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
         public async Task RemoveRole(UserRolePairModel userRolePair)
         {
+            string loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            UserModel loggedInUser = _userData.GetUserById(loggedInUserId).First();
             IdentityUser user = await _userManager.FindByIdAsync(userRolePair.UserId);
+
+            _logger.LogInformation("ADMIN: {Admin} removed user {User} from role {Role}.", loggedInUser.EmailAddress, user.Email, userRolePair.RoleName);
+
             _ = await _userManager.RemoveFromRoleAsync(user, userRolePair.RoleName);
         }
         #endregion
