@@ -11,6 +11,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 	{
 		private readonly ILoggedInUserModel _loggedInUser;
 
+		public bool IsLoggedOut => !IsLoggedIn;
 		public bool IsLoggedIn => !string.IsNullOrWhiteSpace(_loggedInUser.Token);
 		public bool CanViewUsers => IsLoggedIn;
 
@@ -26,6 +27,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		{
 			await ActivateItemAsync(IoC.Get<SalesViewModel>(), cancellationToken);
 			NotifyOfPropertyChange(() => IsLoggedIn);
+			NotifyOfPropertyChange(() => IsLoggedOut);
 			NotifyOfPropertyChange(() => CanViewUsers);
 		}
 
@@ -45,7 +47,13 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			IoC.Get<IAPIHelper>().LogoutUser();
 			await ActivateItemAsync(IoC.Get<LoginViewModel>(), new CancellationToken());
 			NotifyOfPropertyChange(() => IsLoggedIn);
+			NotifyOfPropertyChange(() => IsLoggedOut);
 			NotifyOfPropertyChange(() => CanViewUsers);
+		}
+
+		public async Task Login()
+		{
+			await ActivateItemAsync(IoC.Get<LoginViewModel>(), new CancellationToken());
 		}
 
 		public async Task ViewUsersPage()
@@ -53,5 +61,9 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			await ActivateItemAsync(IoC.Get<UserDisplayViewModel>(), new CancellationToken());
 		}
 
+		public async Task ViewSalePage()
+		{
+			await ActivateItemAsync(IoC.Get<SalesViewModel>(), new CancellationToken());
+		}
 	}
 }

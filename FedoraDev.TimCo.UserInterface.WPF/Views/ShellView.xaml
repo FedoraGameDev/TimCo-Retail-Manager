@@ -36,11 +36,15 @@
 						<MenuItem Header="_File" VerticalAlignment="Bottom" Height="32">
 							<MenuItem x:Name="ExitApplication" Header="E_xit" />
 						</MenuItem>
+						<MenuItem Header="_View" VerticalAlignment="Bottom" Height="32" Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+							<MenuItem x:Name="ViewSalePage" Header="_Sales" Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+						</MenuItem>
 						<MenuItem Header="_Users" Visibility="{Binding CanViewUsers, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
 							<MenuItem x:Name="ViewUsersPage" Header="User _Management" />
 						</MenuItem>
-						<MenuItem Header="_Account" Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
-							<MenuItem x:Name="Logout" Header="_Logout" />
+						<MenuItem Header="_Account">
+							<MenuItem x:Name="Logout" Header="Log_out" Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}" />
+							<MenuItem x:Name="Login" Header="Log_in" Visibility="{Binding IsLoggedOut, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}" />
 						</MenuItem>
 					</Menu>
 				</StackPanel>
