@@ -1,4 +1,3 @@
-using FedoraDev.TimCo.Data.API.Controllers;
 using FedoraDev.TimCo.Data.API.Data;
 using FedoraDev.TimCo.DataManager.Library.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Internal.DataAccess;
@@ -19,8 +18,21 @@ namespace FedoraDev.TimCo.Data.API
 {
 	public class Startup
 	{
+		#region Fields
+		private const string CORS_POLICY_NAME = "OpenCorsPolicy";
+		private const string AUTH_DB_NAME = "TimCo-Auth";
+		private const string SWAGGER_API_TITLE = "TimCo Retail Manager API";
+		private const string SWAGGER_API_VERSION = "v1";
+		private const string SECURITY_KEY_LOCATION = "Secrets:SecurityKey";
+		private const string WEB_EXCEPTION_HANDLER = "/Home/Error";
+		private const string ENDPOINT_MAP_NAME = "default";
+		private const string ENDPOINT_MAP_PATTERN = "{controller=Home}/{action=Index}/{id?}";
+		#endregion
+
 		#region Properties
 		public IConfiguration Configuration { get; }
+		private static string SwaggerEndpointURL => $"/swagger/{SWAGGER_API_VERSION}/swagger.json";
+		private static string SwaggerEndpointName => $"TimCo API {SWAGGER_API_VERSION.ToUpper()}";
 		#endregion
 
 		#region Configuration at a Glance
@@ -54,7 +66,7 @@ namespace FedoraDev.TimCo.Data.API
 		{
 			_ = services.AddDbContext<ApplicationDbContext>(options =>
 				  options.UseSqlServer(
-					  Configuration.GetConnectionString("TimCo-Auth")
+					  Configuration.GetConnectionString(AUTH_DB_NAME)
 				  )
 			);
 		}
@@ -69,6 +81,16 @@ namespace FedoraDev.TimCo.Data.API
 
 		private void AddWeb(IServiceCollection services)
 		{
+			_ = services.AddCors(policy =>
+			{
+				policy.AddPolicy(CORS_POLICY_NAME, options =>
+				{
+					_ = options
+						.AllowAnyOrigin()
+						.AllowAnyHeader()
+						.AllowAnyMethod();
+				});
+			});
 			_ = services.AddControllersWithViews();
 			_ = services.AddRazorPages();
 		}
@@ -94,7 +116,7 @@ namespace FedoraDev.TimCo.Data.API
 				jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
 				{
 					ValidateIssuerSigningKey = true,
-					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("Secrets:SecurityKey"))),
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>(SECURITY_KEY_LOCATION))),
 					ValidateIssuer = false,
 					ValidateAudience = false,
 					ValidateLifetime = true,
@@ -107,7 +129,7 @@ namespace FedoraDev.TimCo.Data.API
 		{
 			_ = services.AddSwaggerGen(setup =>
 			{
-				setup.SwaggerDoc("v1", new OpenApiInfo { Title = "TimCo Retail Manager API", Version = "v1" });
+				setup.SwaggerDoc(SWAGGER_API_VERSION, new OpenApiInfo { Title = SWAGGER_API_TITLE, Version = SWAGGER_API_VERSION });
 			});
 		}
 
@@ -122,44 +144,48 @@ namespace FedoraDev.TimCo.Data.API
 		{
 			if (env.IsDevelopment())
 			{
-				app.UseDeveloperExceptionPage();
-				app.UseDatabaseErrorPage();
+				_ = app
+					.UseDeveloperExceptionPage()
+					.UseDatabaseErrorPage();
 			}
 			else
 			{
-				app.UseExceptionHandler("/Home/Error");
-				app.UseHsts();
+				_ = app
+					.UseExceptionHandler(WEB_EXCEPTION_HANDLER)
+					.UseHsts();
 			}
 		}
 
 		private void UseRouting(IApplicationBuilder app)
 		{
-			app.UseHttpsRedirection();
-			app.UseStaticFiles();
-
-			app.UseRouting();
-
-			app.UseAuthentication();
-			app.UseAuthorization();
+			_ = app
+				.UseHttpsRedirection()
+				.UseCors(CORS_POLICY_NAME)
+				.UseStaticFiles()
+				.UseRouting()
+				.UseAuthentication()
+				.UseAuthorization();
 		}
 
 		private void UseSwagger(IApplicationBuilder app)
 		{
-			app.UseSwagger();
-			app.UseSwaggerUI(swaggerOptions =>
-			{
-				swaggerOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "TimCo API v1");
-			});
+			_ = app
+				.UseSwagger()
+				.UseSwaggerUI(swaggerOptions =>
+				{
+					swaggerOptions.SwaggerEndpoint(SwaggerEndpointURL, SwaggerEndpointName);
+				});
 		}
 
 		private void UseEndpoints(IApplicationBuilder app)
 		{
 			app.UseEndpoints(endpoints =>
 			{
-				endpoints.MapControllerRoute(
-					name: "default",
-					pattern: "{controller=Home}/{action=Index}/{id?}");
-				endpoints.MapRazorPages();
+				_ = endpoints.MapControllerRoute(
+					name: ENDPOINT_MAP_NAME,
+					pattern: ENDPOINT_MAP_PATTERN
+				);
+				_ = endpoints.MapRazorPages();
 			});
 		}
 		#endregion
