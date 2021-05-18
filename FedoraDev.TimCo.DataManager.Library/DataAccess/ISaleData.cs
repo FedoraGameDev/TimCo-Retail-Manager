@@ -7,5 +7,6 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 	{
 		List<SaleReportModel> GetSaleReport();
 		void SaveSale(SaleModel saleInfo, string cashierId);
+		decimal GetTaxRate();
 	}
 }

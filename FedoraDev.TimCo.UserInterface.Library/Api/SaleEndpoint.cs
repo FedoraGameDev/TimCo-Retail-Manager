@@ -25,5 +25,16 @@ namespace FedoraDev.TimCo.UserInterface.Library.Api
 				throw new Exception(response.ReasonPhrase);
 			}
 		}
+
+		public async Task<decimal> GetTaxRate()
+		{
+			using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/api/Sale/GetTaxRate"))
+			{
+				if (response.IsSuccessStatusCode)
+					return await response.Content.ReadAsAsync<decimal>();
+
+				throw new Exception(response.ReasonPhrase);
+			}
+		}
 	}
 }

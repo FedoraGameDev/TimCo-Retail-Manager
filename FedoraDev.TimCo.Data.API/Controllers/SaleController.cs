@@ -40,5 +40,14 @@ namespace FedoraDev.TimCo.Data.API.Controllers
 
             return saleData.GetSaleReport();
         }
+
+        [HttpGet, Route("GetTaxRate")]
+        [AllowAnonymous]
+        public decimal GetTaxRate()
+		{
+            ISaleData saleData = _serviceProvider.GetRequiredService<ISaleData>();
+
+            return saleData.GetTaxRate();
+		}
     }
 }

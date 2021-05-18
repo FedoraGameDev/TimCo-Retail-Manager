@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Caliburn.Micro;
 using FedoraDev.TimCo.UserInterface.Library.Api;
-using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
 using FedoraDev.TimCo.UserInterface.WPF.EventModels;
 using FedoraDev.TimCo.UserInterface.WPF.Models;
@@ -24,6 +23,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private int _itemQuantity = 1;
 		private ProductWPFModel _selectedProduct;
 		private CartItemWPFModel _selectedCartItem;
+		private decimal _taxRate;
 		#endregion
 
 		#region Properties
@@ -97,6 +97,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			{
 				base.OnViewLoaded(view);
 				await LoadProducts();
+				_taxRate = await IoC.Get<ISaleEndpoint>().GetTaxRate();
 			}
 			catch (Exception ex)
 			{
@@ -203,11 +204,10 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 		private decimal CalculateTax()
 		{
 			decimal taxAmount = 0;
-			decimal taxRate = IoC.Get<IConfigHelper>().GetTaxRate();
 
 			taxAmount = Cart
 				.Where(item => item.Product.Taxable)
-				.Sum(item => item.Product.RetailPrice * item.QuantityInCart * taxRate);
+				.Sum(item => item.Product.RetailPrice * item.QuantityInCart * _taxRate);
 
 			return Math.Round(taxAmount + 0.005m, 2);
 		}

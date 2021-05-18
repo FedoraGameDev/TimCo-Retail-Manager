@@ -1,7 +1,9 @@
 ﻿using FedoraDev.TimCo.DataManager.Library.Internal.DataAccess;
 using FedoraDev.TimCo.DataManager.Library.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 
 namespace FedoraDev.TimCo.DataManager.Library.DataAccess
@@ -10,11 +12,13 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 	{
 		private readonly ISqlDataAccess _sqlDataAccess;
 		private readonly IProductData _productData;
+		private readonly IConfiguration _configuration;
 
-		public SaleData(ISqlDataAccess sqlDataAccess, IProductData productData)
+		public SaleData(ISqlDataAccess sqlDataAccess, IProductData productData, IConfiguration configuration)
 		{
 			_sqlDataAccess = sqlDataAccess;
 			_productData = productData;
+			_configuration = configuration;
 		}
 
 		public void SaveSale(SaleModel saleInfo, string cashierId)
@@ -41,6 +45,16 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 			};
 		}
 
+		public decimal GetTaxRate()
+		{
+			bool isValid = decimal.TryParse(_configuration.GetValue<string>("TaxRate"), out decimal taxRate);
+
+			if (!isValid)
+				throw new ConfigurationErrorsException("The tax rate is not a valid double value. It should be in the form of '8.75'");
+
+			return taxRate / 100m;
+		}
+
 		private List<SaleDetailDBModel> GenerateSaleDetails(SaleModel saleInfo)
 		{
 			List<SaleDetailDBModel> saleDetails = new List<SaleDetailDBModel>();
@@ -52,7 +66,7 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 					throw new Exception($"The ProductId '{saleDetail.ProductId}' could not be found in the database.");
 
 				decimal purchasePrice = productInfo.RetailPrice * saleDetail.Quantity;
-				decimal tax = purchasePrice * (productInfo.Taxable ? ConfigHelper.GetTaxRate() : 0m);
+				decimal tax = purchasePrice * (productInfo.Taxable ? GetTaxRate() : 0m);
 
 				saleDetails.Add(new SaleDetailDBModel()
 				{

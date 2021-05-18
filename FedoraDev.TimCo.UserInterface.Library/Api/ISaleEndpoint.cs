@@ -6,5 +6,6 @@ namespace FedoraDev.TimCo.UserInterface.Library.Api
 	public interface ISaleEndpoint
 	{
 		Task PostSale(SaleModel sale);
+		Task<decimal> GetTaxRate();
 	}
 }
