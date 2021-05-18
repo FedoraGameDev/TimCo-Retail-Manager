@@ -65,7 +65,7 @@ namespace FedoraDev.TimCo.UserInterface.WPF.ViewModels
 			{
 				ErrorMessage = string.Empty;
 				IAPIHelper apiHelper = IoC.Get<IAPIHelper>();
-				AuthenticatedUser aUser = await apiHelper.Authenticate(UserName, Password);
+				AuthenticatedUserModel aUser = await apiHelper.Authenticate(UserName, Password);
 
 				await apiHelper.SetLoggedInUserInfo(aUser.Access_Token);
 

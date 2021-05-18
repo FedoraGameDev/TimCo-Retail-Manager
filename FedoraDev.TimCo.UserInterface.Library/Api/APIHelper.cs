@@ -31,7 +31,7 @@ namespace FedoraDev.TimCo.UserInterface.Library.Helpers
 			_apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 		}
 
-		public async Task<AuthenticatedUser> Authenticate(string username, string password)
+		public async Task<AuthenticatedUserModel> Authenticate(string username, string password)
 		{
 			FormUrlEncodedContent data = new FormUrlEncodedContent(new[] {
 				new KeyValuePair<string, string>("grant_type", "password"),
@@ -43,7 +43,7 @@ namespace FedoraDev.TimCo.UserInterface.Library.Helpers
 			{
 				if (responseMessage.IsSuccessStatusCode)
 				{
-					AuthenticatedUser user = await responseMessage.Content.ReadAsAsync<AuthenticatedUser>();
+					AuthenticatedUserModel user = await responseMessage.Content.ReadAsAsync<AuthenticatedUserModel>();
 					return user;
 				}
 
