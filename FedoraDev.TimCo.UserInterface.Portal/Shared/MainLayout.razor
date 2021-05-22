@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-@using System.Security.Claims
+@using FedoraDev.TimCo.UserInterface.Portal.Pages
 
 <div class="page">
     <div class="sidebar">
@@ -11,17 +11,18 @@
 		<div class="top-row px-4">
 			<AuthorizeView Roles="Admin">
 				<Authorized>
-					<p>Admin</p>
+					Admin
 				</Authorized>
 			</AuthorizeView>
 			<AuthorizeView>
 				<Authorized>
-					<span class="ml-md-8" />
-					<p class="ml-md-2">@context.User.FindFirst(ClaimTypes.Name).Value</p>
-					<a href="logout" class="ml-md-2">Logout</a>
+					@context.User.FindFirst(ClaimTypes.Name).Value
+					<NavLink href="logout" class="nav-link">
+						<span class="oi oi-account-logout"/> Logout
+					</NavLink>
 				</Authorized>
 				<NotAuthorized>
-					<a href="login" class="ml-md-auto">Login</a>
+					<Login/>
 				</NotAuthorized>
 			</AuthorizeView>
 		</div>

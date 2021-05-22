@@ -2,6 +2,7 @@
 using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
 using FedoraDev.TimCo.UserInterface.Portal.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -14,7 +15,7 @@ namespace FedoraDev.TimCo.UserInterface.Portal.Authentication
 	public class AuthenticationService : IAuthenticationService
 	{
 		private readonly HttpClient _httpClient;
-		private readonly IAuthenticationStateProvider _authenticationStateProvider;
+		private readonly AuthenticationStateProvider _authenticationStateProvider;
 		private readonly ILocalStorageService _localStorageService;
 		private readonly IAPIHelper _apiHelper;
 		private readonly IConfiguration _configuration;
@@ -22,7 +23,7 @@ namespace FedoraDev.TimCo.UserInterface.Portal.Authentication
 		public AuthenticationService(IServiceProvider serviceProvider)
 		{
 			_httpClient = serviceProvider.GetRequiredService<HttpClient>();
-			_authenticationStateProvider = serviceProvider.GetRequiredService<IAuthenticationStateProvider>();
+			_authenticationStateProvider = serviceProvider.GetRequiredService<AuthenticationStateProvider>();
 			_localStorageService = serviceProvider.GetRequiredService<ILocalStorageService>();
 			_apiHelper = serviceProvider.GetRequiredService<IAPIHelper>();
 			_configuration = serviceProvider.GetRequiredService<IConfiguration>();
@@ -35,9 +36,9 @@ namespace FedoraDev.TimCo.UserInterface.Portal.Authentication
 				AuthenticatedUserModel authenticatedUser = await _apiHelper.Authenticate(authenticationUser.EmailAddress, authenticationUser.Password);
 				await _localStorageService.SetItemAsync(_configuration["AuthTokenStorageKey"], authenticatedUser.Access_Token);
 
-				_authenticationStateProvider.NotifyUserAuthentication(authenticatedUser.Access_Token);
-
 				_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", authenticatedUser.Access_Token);
+
+				(_authenticationStateProvider as IAuthenticationStateProvider)?.NotifyUserAuthentication(authenticatedUser.Access_Token);
 
 				return authenticatedUser;
 			}
@@ -50,8 +51,8 @@ namespace FedoraDev.TimCo.UserInterface.Portal.Authentication
 		public async Task Logout()
 		{
 			await _localStorageService.RemoveItemAsync(_configuration["AuthTokenStorageKey"]);
-			_authenticationStateProvider.NotifyUserLogout();
 			_httpClient.DefaultRequestHeaders.Authorization = null;
+			(_authenticationStateProvider as IAuthenticationStateProvider)?.NotifyUserLogout();
 		}
 	}
 }

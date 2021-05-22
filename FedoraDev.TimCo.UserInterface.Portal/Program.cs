@@ -20,7 +20,6 @@ namespace FedoraDev.TimCo.UserInterface.Portal
 
 			_ = builder.Services
 				.AddScoped<IAuthenticationService, AuthenticationService>()
-				.AddScoped<IAuthenticationStateProvider, DefaultAuthenticationStateProvider>()
 				.AddScoped<AuthenticationStateProvider, DefaultAuthenticationStateProvider>()
 				.AddScoped<ILoggedInUserModel, LoggedInUserModel>()
 				.AddScoped<IAPIHelper, APIHelper>();
