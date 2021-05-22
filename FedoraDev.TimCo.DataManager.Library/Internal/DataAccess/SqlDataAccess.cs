@@ -36,7 +36,7 @@ namespace FedoraDev.TimCo.DataManager.Library.Internal.DataAccess
 				return connection.Query<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure).ToList();
 		}
 
-		public void SaveData<T>(string storedProcedure, T parameters, string connectionStringName)
+		public void SaveData<T>(string connectionStringName, string storedProcedure, T parameters)
 		{
 			string connectionString = GetConnectionString(connectionStringName);
 

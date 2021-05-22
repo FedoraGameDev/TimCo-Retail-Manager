@@ -81,6 +81,43 @@ namespace FedoraDev.TimCo.Data.API.Controllers
         #endregion
 
         #region Post
+        [HttpPost, Route("Register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register(UserRegistrationModel userRegistration)
+		{
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+			IdentityUser existingUser = await _userManager.FindByEmailAsync(userRegistration.EmailAddress);
+            if (existingUser != null)
+                return BadRequest();
+
+            IdentityUser newUser = new()
+            {
+                Email = userRegistration.EmailAddress,
+                EmailConfirmed = true,
+                UserName = userRegistration.EmailAddress
+            };
+
+            IdentityResult result = await _userManager.CreateAsync(newUser, userRegistration.Password);
+            if (!result.Succeeded)
+                return BadRequest();
+
+            existingUser = await _userManager.FindByEmailAsync(userRegistration.EmailAddress);
+            if (existingUser == null)
+                return BadRequest();
+
+            UserModel user = new UserModel()
+            {
+                FirstName = userRegistration.FirstName,
+                LastName = userRegistration.LastName,
+                EmailAddress = userRegistration.EmailAddress,
+                Id = existingUser.Id
+            };
+            _userData.CreateUser(user);
+            return Ok();
+		}
+
         [HttpPost, Route("Admin/AddRole")]
         [Authorize(Roles = Roles.ADMIN_AND_MANAGER)]
         public async Task AddRole(UserRolePairModel userRolePair)

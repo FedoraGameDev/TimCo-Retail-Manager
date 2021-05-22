@@ -21,7 +21,7 @@ namespace FedoraDev.TimCo.DataManager.Library.DataAccess
 
 		public void SaveInventoryItem(InventoryModel itemData)
 		{
-			_sqlDataAccess.SaveData("spInventoryInsert", itemData, "TimCo-Data");
+			_sqlDataAccess.SaveData("TimCo-Data", "spInventoryInsert", itemData);
 		}
 	}
 
