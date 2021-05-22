@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "User Interface", "User Inte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FedoraDev.TimCo.Data.API", "FedoraDev.TimCo.Data.API\FedoraDev.TimCo.Data.API.csproj", "{60000C8D-D794-4F43-9DC8-16063A8FEEFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FedoraDev.TimCo.UserInterface.Portal", "FedoraDev.TimCo.UserInterface.Portal\FedoraDev.TimCo.UserInterface.Portal.csproj", "{F3D43ECF-9F55-440F-9CED-2F3B3BF5A2D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FedoraDev.TimCo.UserInterface.Portal", "FedoraDev.TimCo.UserInterface.Portal\FedoraDev.TimCo.UserInterface.Portal.csproj", "{F3D43ECF-9F55-440F-9CED-2F3B3BF5A2D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

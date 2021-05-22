@@ -1,5 +1,6 @@
 using Blazored.LocalStorage;
 using FedoraDev.TimCo.UserInterface.Library.Helpers;
+using FedoraDev.TimCo.UserInterface.Library.Models;
 using FedoraDev.TimCo.UserInterface.Portal.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -16,6 +17,9 @@ namespace FedoraDev.TimCo.UserInterface.Portal
 		{
 			WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
 			builder.RootComponents.Add<App>("#app");
+
+			_ = builder.Services
+				.AddSingleton<ILoggedInUserModel, LoggedInUserModel>();
 
 			_ = builder.Services
 				.AddScoped<IAuthenticationService, AuthenticationService>()

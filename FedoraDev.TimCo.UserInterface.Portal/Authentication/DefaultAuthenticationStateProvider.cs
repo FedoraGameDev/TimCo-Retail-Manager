@@ -21,6 +21,7 @@ namespace FedoraDev.TimCo.UserInterface.Portal.Authentication
 		{
 			_httpClient = httpClient;
 			_localStorageService = localStorageService;
+			_anonymous = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 		}
 
 		public override async Task<AuthenticationState> GetAuthenticationStateAsync()

@@ -23,7 +23,10 @@ namespace FedoraDev.TimCo.UserInterface.Library.Helpers
 
 		private void InitilalizeClient()
 		{
+			// TODO: fix webassembly configuration
 			string api = ConfigurationManager.AppSettings["api"];
+			if (string.IsNullOrEmpty(api))
+				api = "https://localhost:5001/";
 
 			_apiClient = new HttpClient();
 			_apiClient.BaseAddress = new Uri(api);

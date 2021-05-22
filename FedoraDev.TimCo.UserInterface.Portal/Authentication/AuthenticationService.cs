@@ -25,14 +25,21 @@ namespace FedoraDev.TimCo.UserInterface.Portal.Authentication
 
 		public async Task<AuthenticatedUserModel> Login(AuthenticationUserModel authenticationUser)
 		{
-			AuthenticatedUserModel authenticatedUser = await _apiHelper.Authenticate(authenticationUser.EmailAddress, authenticationUser.Password);
-			await _localStorageService.SetItemAsync(DefaultAuthenticationStateProvider.AUTHENTICATION_TOKEN_KEY, authenticatedUser.Access_Token);
+			try
+			{
+				AuthenticatedUserModel authenticatedUser = await _apiHelper.Authenticate(authenticationUser.EmailAddress, authenticationUser.Password);
+				await _localStorageService.SetItemAsync(DefaultAuthenticationStateProvider.AUTHENTICATION_TOKEN_KEY, authenticatedUser.Access_Token);
 
-			_authenticationStateProvider.NotifyUserAuthentication(authenticatedUser.Access_Token);
+				_authenticationStateProvider.NotifyUserAuthentication(authenticatedUser.Access_Token);
 
-			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", authenticatedUser.Access_Token);
+				_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", authenticatedUser.Access_Token);
 
-			return authenticatedUser;
+				return authenticatedUser;
+			}
+			catch
+			{
+				return null;
+			}
 		}
 
 		public async Task Logout()

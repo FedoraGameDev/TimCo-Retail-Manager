@@ -1,0 +1,60 @@
+﻿@page "/login"
+@inject IAuthenticationService _authenticationService;
+@inject NavigationManager _navigationManager;
+
+<h3>Login</h3>
+
+@if (_showAuthenticationError)
+{
+	<div class="alert alert-danger" role="alert">
+		<p>@_authenticationError</p>
+	</div>
+}
+
+<EditForm Model="_authenticationUser" OnValidSubmit="ExecuteLogin" class="card card-body bg-light mt-5">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<div class="form-group row">
+		<label for="email" class="col-md-2 col-form-label">Email:</label>
+		<div class="col-md-10">
+			<InputText id="email" class="form-control" @bind-Value="_authenticationUser.EmailAddress" />
+			<ValidationMessage For="@(() => _authenticationUser.EmailAddress)" />
+		</div>
+	</div>
+
+	<div class="form-group row">
+		<label for="password" class="col-md-2 col-form-label">Password:</label>
+		<div class="col-md-10">
+			<InputText id="password" type="password" class="form-control" @bind-Value="_authenticationUser.Password" />
+			<ValidationMessage For="@(() => _authenticationUser.Password)" />
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12 text-right">
+			<button type="submit" class="btn btn-success">Login</button>
+		</div>
+	</div>
+</EditForm>
+
+@code {
+	private AuthenticationUserModel _authenticationUser = new();
+	private bool _showAuthenticationError = false;
+	private string _authenticationError = string.Empty;
+
+	private async Task ExecuteLogin()
+	{
+		_showAuthenticationError = false;
+		AuthenticatedUserModel result = await _authenticationService.Login(_authenticationUser);
+
+		if (result != null)
+		{
+			_navigationManager.NavigateTo("/");
+			return;
+		}
+
+		_authenticationError = "An error occured while attempting to login.";
+		_showAuthenticationError = true;
+	}
+}

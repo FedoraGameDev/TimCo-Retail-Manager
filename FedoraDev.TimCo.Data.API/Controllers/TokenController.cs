@@ -16,8 +16,6 @@ namespace FedoraDev.TimCo.Data.API.Controllers
 {
 	public class TokenController : Controller
 	{
-		public static string SecretKey => "MySecretKeyIsSecretSoDoNotTell";
-
 		private readonly ApplicationDbContext _dbContext;
 		private readonly UserManager<IdentityUser> _userManager;
 		private readonly IServiceProvider _serviceProvider;
