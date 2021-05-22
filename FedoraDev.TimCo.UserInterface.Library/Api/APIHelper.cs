@@ -1,4 +1,5 @@
 ﻿using FedoraDev.TimCo.UserInterface.Library.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -12,21 +13,20 @@ namespace FedoraDev.TimCo.UserInterface.Library.Helpers
 	{
 		private HttpClient _apiClient;
 		private ILoggedInUserModel _user;
+		private readonly IConfiguration _configuration;
 
 		public HttpClient ApiClient => _apiClient;
 
-		public APIHelper(ILoggedInUserModel user)
+		public APIHelper(ILoggedInUserModel user, IConfiguration configuration)
 		{
-			InitilalizeClient();
 			_user = user;
+			_configuration = configuration;
+			InitilalizeClient();
 		}
 
 		private void InitilalizeClient()
 		{
-			// TODO: fix webassembly configuration
-			string api = ConfigurationManager.AppSettings["api"];
-			if (string.IsNullOrEmpty(api))
-				api = "https://localhost:5001/";
+			string api = _configuration["API"];
 
 			_apiClient = new HttpClient();
 			_apiClient.BaseAddress = new Uri(api);

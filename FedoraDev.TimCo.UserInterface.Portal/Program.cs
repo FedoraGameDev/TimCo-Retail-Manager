@@ -19,12 +19,10 @@ namespace FedoraDev.TimCo.UserInterface.Portal
 			builder.RootComponents.Add<App>("#app");
 
 			_ = builder.Services
-				.AddSingleton<ILoggedInUserModel, LoggedInUserModel>();
-
-			_ = builder.Services
 				.AddScoped<IAuthenticationService, AuthenticationService>()
 				.AddScoped<IAuthenticationStateProvider, DefaultAuthenticationStateProvider>()
 				.AddScoped<AuthenticationStateProvider, DefaultAuthenticationStateProvider>()
+				.AddScoped<ILoggedInUserModel, LoggedInUserModel>()
 				.AddScoped<IAPIHelper, APIHelper>();
 
 			_ = builder.Services.AddBlazoredLocalStorage();
