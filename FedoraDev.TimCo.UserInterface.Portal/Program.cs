@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using FedoraDev.TimCo.UserInterface.Library.Api;
 using FedoraDev.TimCo.UserInterface.Library.Helpers;
 using FedoraDev.TimCo.UserInterface.Library.Models;
 using FedoraDev.TimCo.UserInterface.Portal.Authentication;
@@ -20,9 +21,12 @@ namespace FedoraDev.TimCo.UserInterface.Portal
 
 			_ = builder.Services
 				.AddScoped<IAuthenticationService, AuthenticationService>()
-				.AddScoped<AuthenticationStateProvider, DefaultAuthenticationStateProvider>()
-				.AddScoped<ILoggedInUserModel, LoggedInUserModel>()
-				.AddScoped<IAPIHelper, APIHelper>();
+				.AddScoped<AuthenticationStateProvider, DefaultAuthenticationStateProvider>();
+
+			_ = builder.Services
+				.AddSingleton<IAPIHelper, APIHelper>()
+				.AddSingleton<ILoggedInUserModel, LoggedInUserModel>()
+				.AddSingleton<IUserEndpoint, UserEndpoint>();
 
 			_ = builder.Services.AddBlazoredLocalStorage();
 			_ = builder.Services.AddAuthorizationCore();

@@ -16,6 +16,17 @@ namespace FedoraDev.TimCo.UserInterface.Library.Api
 			_apiHelper = apiHelper;
 		}
 
+		public async Task RegisterUser(RegisterationUserModel user)
+		{
+			var data = new { user.FirstName, user.LastName, user.EmailAddress, user.Password };
+
+			using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Register", data))
+			{
+				if (!response.IsSuccessStatusCode)
+					throw new Exception(response.ReasonPhrase);
+			}
+		}
+
 		public async Task<List<UserModel>> GetAll()
 		{
 			using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/api/User/Admin/GetAll"))
@@ -40,11 +51,7 @@ namespace FedoraDev.TimCo.UserInterface.Library.Api
 
 		public async Task AddUserToRole(string userId, string roleName)
 		{
-			var data = new
-			{
-				UserId = userId,
-				RoleName = roleName
-			};
+			var data = new { UserId = userId, RoleName = roleName };
 
 			using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Admin/AddRole", data))
 			{
@@ -55,11 +62,7 @@ namespace FedoraDev.TimCo.UserInterface.Library.Api
 
 		public async Task RemoveUserFromRole(string userId, string roleName)
 		{
-			var data = new
-			{
-				UserId = userId,
-				RoleName = roleName
-			};
+			var data = new { UserId = userId, RoleName = roleName };
 
 			using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Admin/RemoveRole", data))
 			{

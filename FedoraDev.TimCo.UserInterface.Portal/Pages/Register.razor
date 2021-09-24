@@ -1,0 +1,76 @@
+﻿@page "/register"
+
+@inject IUserEndpoint _userEndpoint
+@inject IAuthenticationService _authenticationService;
+@inject NavigationManager _navigationManager;
+
+<EditForm Model="_user" OnValidSubmit="TryExecuteRegister" class="">
+	<div class="form-row">
+		<div class="col-auto">
+			<label for="email" class="sr-only">Email</label>
+			<InputText id="email" class="form-control" @bind-Value="_user.EmailAddress" placeholder="Email Address" />
+		</div>
+
+		<div class="col-auto">
+			<label for="firstname" class="sr-only">First Name</label>
+			<InputText id="firstname" class="form-control" @bind-Value="_user.FirstName" placeholder="Fist Name" />
+		</div>
+
+		<div class="col-auto">
+			<label for="lastname" class="sr-only">Last Name</label>
+			<InputText id="lastname" class="form-control" @bind-Value="_user.LastName" placeholder="Last Name" />
+		</div>
+
+		<div class="col-auto">
+			<label for="password" class="sr-only">Password</label>
+			<InputText id="password" type="password" class="form-control" @bind-Value="_user.Password" placeholder="Password" />
+		</div>
+
+		<div class="col-auto">
+			<label for="confirmpassword" class="sr-only">Password</label>
+			<InputText id="confirmpassword" type="password" class="form-control" @bind-Value="_user.ConfirmPassword" placeholder="Confirm Password" />
+		</div>
+
+		<div class="col-auto">
+			<button type="submit" class="btn btn-success">Register</button>
+		</div>
+	</div>
+</EditForm>
+
+@code {
+	private RegisterationUserModel _user = new();
+	private string _registrationError = string.Empty;
+	private bool _showRegisterError = false;
+
+	private async Task ExecuteRegister()
+	{
+		await _userEndpoint.RegisterUser(_user);
+
+		AuthenticationUserModel authenticationUser = new()
+		{
+			EmailAddress = _user.EmailAddress,
+			Password = _user.Password
+		};
+
+		AuthenticatedUserModel registeredUser = await _authenticationService.Login(authenticationUser);
+		if (registeredUser == null)
+			throw new Exception("An error occured while attempting to register.");
+
+		_navigationManager.NavigateTo("/");
+		return;
+	}
+
+	private async Task TryExecuteRegister()
+	{
+		try
+		{
+			_showRegisterError = false;
+			await ExecuteRegister();
+		}
+		catch (Exception exception)
+		{
+			_registrationError = exception.Message;
+			_showRegisterError = true;
+		}
+	}
+}

@@ -16,13 +16,17 @@
 		<div class="col-auto">
 			<button type="submit" class="btn btn-success">Login</button>
 		</div>
+
+		<div class="col-auto">
+			<NavLink href="/register" class="nav-link">Register</NavLink>
+		</div>
 	</div>
 </EditForm>
 
 @code {
 	private AuthenticationUserModel _authenticationUser = new();
-	private bool _showAuthenticationError = false;
 	private string _authenticationError = string.Empty;
+	private bool _showAuthenticationError = false;
 
 	private async Task ExecuteLogin()
 	{
